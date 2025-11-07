@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Interactive MB–MC Slides • Reveal.js + KaTeX + D3</title>
+  
+  <!-- Reveal.js core & theme (pinned versions for reproducibility) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+  <link id="theme" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/black.css">
+  
+  <!-- KaTeX for fast math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  
+  <style>
+    :root { --fg: #e5e7eb; --muted: #9ca3af; --accent: #60a5fa; }
+    .reveal { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; }
+    .reveal h1, .reveal h2, .reveal h3 { letter-spacing: 0.3px; }
+    .subtitle { color: var(--muted); font-size: 0.9em; margin-top: -0.5rem; }
+    .katex { font-size: 1.1em; }
+    /* Figure area */
+    #chart-wrap { width: 960px; max-width: 95vw; margin: 0 auto; }
+    #controls { display: flex; align-items: center; gap: 0.75rem; justify-content: center; margin-top: 0.5rem; flex-wrap: wrap; }
+    #controls label { color: var(--muted); }
+    input[type="range"] { width: 220px; }
+    .pill { display:inline-block; padding: 2px 10px; border-radius: 999px; background:#111827; color:#9CA3AF; border:1px solid #374151; font-size:0.8em }
+    .legend { display:flex; gap:12px; justify-content:center; margin-top: 6px; }
+    .legend span { display:inline-flex; align-items:center; gap:6px; color: var(--muted); }
+    .swatch { width:12px; height:12px; display:inline-block; border-radius: 2px; background: currentColor; }
+    .note { color: var(--muted); font-size: 0.85em; }
+    .btn { border:1px solid #374151; background:#0b1220; color:#e5e7eb; padding:6px 12px; border-radius:12px; cursor:pointer; }
+    .btn:active { transform: translateY(1px); }
+    .hl { color: var(--accent); }
+    /* Auto-animate helpers */
+    [data-id] { display:inline-block }
+    /* Diagnostics */
+    .ok { color:#22c55e }
+    .bad { color:#ef4444 }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 0.9em }
+      /* Persistent overlay that holds the chart at a fixed screen position */
+    #stage-overlay { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; z-index: 20; pointer-events: none; }
+    #stage-overlay svg { pointer-events: none; }
+  </style>
+</head>
+<body>
+  <noscript>
+    <div style="padding:1rem; background:#111827; color:#fca5a5; font-family:system-ui">This deck requires JavaScript. Enable JS to run animations and math.</div>
+  </noscript>
+
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- TITLE -->
+      <section>
+        <h1>Animating FOCs, MB–MC, and Comparative Statics</h1>
+        <div class="subtitle">Reveal.js + KaTeX + D3 (single-file, static, LLM-friendly)</div>
+        <p class="note">Open directly in a modern browser or host as a static page. No build step required.</p>
+        <p>
+          <span class="pill">Math: KaTeX</span>
+          <span class="pill">Graphics: D3</span>
+          <span class="pill">Slides: Reveal.js</span>
+          <span class="pill">Solver: Bisection</span>
+        </p>
+      </section>
+
+      <!-- ALGEBRA (auto-animate) -->
+      <section data-auto-animate>
+        <h2 data-id="hdr">From FOC to Decision Rule</h2>
+        <p data-id="eq1">Start with the FOC: $$\color{#60a5fa}{MB(x)} = \color{#f59e0b}{MC(x;\,\tau)}$$</p>
+        <p class="note">We will walk term-by-term and then visualize the solution and how it shifts with a parameter \(\tau\).</p>
+      </section>
+      <section data-auto-animate>
+        <h2 data-id="hdr">From FOC to Decision Rule</h2>
+        <p data-id="eq1">$$\color{#60a5fa}{a - b\,x} = \color{#f59e0b}{c + d\,x + \tau}$$</p>
+        <p data-id="eq2">Rearrange: $$\color{#60a5fa}{a} - \color{#f59e0b}{c} - \tau = (b + d)\,x$$</p>
+        <p data-id="eq3">Decision rule: $$x^*(\tau) = \frac{a - c - \tau}{b + d}$$</p>
+        <p class="note">Linear example for intuition; we will compute numerically (bisection) for general forms.</p>
+      </section>
+
+      <!-- FIGURE SLIDE 1 (controls) -->
+      <section id="fig1" data-target-tau="0" class="uses-stage">
+        <h2>MB–MC Figure (Baseline)</h2>
+        <div id="chart-wrap">
+          <svg id="chart1" width="960" height="540"></svg>
+          <div class="legend">
+            <span style="color:#60a5fa"><span class="swatch"></span>MB(x)</span>
+            <span style="color:#f59e0b"><span class="swatch"></span>MC(x; <span id="tauLabel">0.00</span>)</span>
+            <span style="color:#22c55e"><span class="swatch"></span>FOC: MB=MC</span>
+          </div>
+          <div id="controls">
+            <label for="tau">Parameter \(\tau\):</label>
+            <input id="tau" type="range" min="-6" max="10" step="0.1" value="0" />
+            <button id="play" class="btn">Play</button>
+            <button id="reset" class="btn">Reset</button>
+            <button id="animateIn" class="btn">Animate In</button>
+            <label for="speed">Speed:</label>
+            <input id="speed" type="range" min="0.25" max="2" step="0.25" value="1" />
+            <span id="speedVal" class="note">1.00×</span>
+          </div>
+          <p class="note">Use <em>Play</em> for an auto sweep of \(\tau\). <em>Animate In</em> redraws curves with a left-to-right stroke animation. Guides track \(x^*\) and \(MB(x^*)\).</p>
+        </div>
+      </section>
+
+      <!-- FIGURE SLIDE 2 (no controls; auto-transition target) -->
+      <section id="fig2" data-target-tau="4" class="uses-stage">
+        <h2>MB–MC Figure (Higher tax/shift)</h2>
+        <div id="chart-wrap">
+          <svg id="chart2" width="960" height="540"></svg>
+          <div class="legend">
+            <span style="color:#60a5fa"><span class="swatch"></span>MB(x)</span>
+            <span style="color:#f59e0b"><span class="swatch"></span>MC(x; <span id="tauLabel2">0.00</span>)</span>
+            <span style="color:#22c55e"><span class="swatch"></span>FOC: MB=MC</span>
+          </div>
+          <p class="note">Advance between the two figure slides to see a **smooth transition** in the equilibrium as \(\tau\) changes. Edit the target with <code>data-target-tau</code> on the slide.</p>
+        </div>
+      </section>
+
+      <!-- DIAGNOSTICS / TESTS -->
+      <section>
+        <h2>Diagnostics</h2>
+        <p class="note">Quick checks that all libraries are loaded and basic numerics & animations work.</p>
+        <button id="run-tests" class="btn">Run checks</button>
+        <div id="test-results" class="mono" style="margin-top:10px"></div>
+      </section>
+
+      <!-- NOTES -->
+      <section>
+        <h2>Notes & Extensions</h2>
+        <ul>
+          <li>Swap in any \(MB(x)\), \(MC(x;\,\tau)\): concavity is not required for bisection, only a sign change on the bracket.</li>
+          <li>For heavier computation, move the root-finding into a Web Worker (non-blocking UI). See <span class="hl">workerCompute</span> in the source.</li>
+          <li>Host this <em>single HTML file</em> anywhere static (e.g., GitHub Pages). No server required.</li>
+          <li>Use <code>data-auto-animate</code> across slides to morph equations smoothly (as above).</li>
+        </ul>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Libraries (order matters; keep core before plugins; remove SRI to prevent blocking on hash mismatches) -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/math/math.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+
+  <script>
+  // --- Robust boot sequence + 16:9 layout + frame-driven sync animation ----
+  (function(){
+    function loadScript(src){
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src; s.onload = resolve; s.onerror = reject; document.head.appendChild(s);
+      });
+    }
+
+    async function ensureDeps(){
+      if (!window.Reveal) { await loadScript('https://unpkg.com/reveal.js@4.5.0/dist/reveal.js'); }
+      if (!window.RevealMath) { await loadScript('https://unpkg.com/reveal.js@4.5.0/plugin/math/math.js'); }
+      if (!window.d3) { await loadScript('https://unpkg.com/d3@7.9.0/dist/d3.min.js'); }
+    }
+
+    function initReveal(){
+      if (!window.Reveal) { console.error('Reveal failed to load.'); return; }
+      Reveal.initialize({
+        width: 1920, height: 1080, // strict 16:9
+        margin: 0.04, minScale: 0.2, maxScale: 2.0,
+        hash: true, slideNumber: 'c/t', transition: 'fade',
+        plugins: [ window.RevealMath && window.RevealMath.KaTeX ? window.RevealMath.KaTeX : [] ].flat(),
+        math: {
+          katex: 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js',
+          katexStylesheet: 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css',
+          delimiters: [ { left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false } ]
+        }
+      });
+    }
+
+    // === Model primitives ===
+    function MB(x, p) { const { a, b } = p; return a - b * x; }
+    function MC(x, p) { const { c, d, tau } = p; return c + d * x + tau; }
+
+    // Robust bisection root finder for f(x)=0 on [lo, hi]
+    function bisect(f, lo, hi, tol = 1e-7, maxIter = 128) {
+      let flo = f(lo), fhi = f(hi);
+      if (Number.isNaN(flo) || Number.isNaN(fhi)) return null;
+      if (flo === 0) return lo; if (fhi === 0) return hi;
+      if (flo * fhi > 0) return null; // no sign change
+      for (let i = 0; i < maxIter; i++) {
+        const mid = 0.5 * (lo + hi); const fmid = f(mid);
+        if (Math.abs(fmid) < tol || (hi - lo) / 2 < tol) return mid;
+        if (flo * fmid <= 0) { hi = mid; fhi = fmid; } else { lo = mid; flo = fmid; }
+      }
+      return 0.5 * (lo + hi);
+    }
+
+    // Inline Web Worker (optional; used in diagnostics)
+    const workerSrc = `self.onmessage = (ev) => {\n  const { a,b,c,d,tau, lo, hi, tol, maxIter } = ev.data;\n  function MB(x){ return a - b*x; }\n  function MC(x){ return c + d*x + tau; }\n  function f(x){ return MB(x) - MC(x); }\n  function bisect(f, lo, hi, tol = 1e-7, maxIter = 128){\n    let flo = f(lo), fhi = f(hi);\n    if (isNaN(flo) || isNaN(fhi) || flo*fhi > 0) { postMessage({ xStar: null }); return; }\n    for (let i=0;i<maxIter;i++){ const m = 0.5*(lo+hi); const fm = f(m); if (Math.abs(fm)<tol || (hi-lo)/2<tol){ postMessage({ xStar: m }); return; } if (flo*fm <= 0){ hi=m; fhi=fm; } else { lo=m; flo=fm; } }\n    postMessage({ xStar: 0.5*(lo+hi) });\n  }\n  bisect(f, lo, hi, tol, maxIter);\n}`;
+    const worker = new Worker(URL.createObjectURL(new Blob([workerSrc], { type: 'application/javascript' })));
+
+    // === Shared animation state across slides ===
+    let charts = [];
+    let currentTau = 0; // shared between slides
+    let playing = false; let rafId = null; let playDir = 1; let lastT = 0;
+
+    function updateTauLabels(){
+      const el1 = document.getElementById('tauLabel');
+      const el2 = document.getElementById('tauLabel2');
+      if (el1) el1.textContent = currentTau.toFixed(2);
+      if (el2) el2.textContent = currentTau.toFixed(2);
+    }
+
+    function broadcastRender(opts){ charts.forEach(c => c.render(currentTau, opts)); updateTauLabels(); }
+
+    // rAF-driven linear tween for tau (constant speed)
+    function animateTauTo(target, duration=1000){
+      if (!isFinite(target)) return;
+      const start = currentTau; const delta = target - start;
+      const t0 = performance.now();
+      function frame(t){
+        const u = Math.min(1, (t - t0) / duration);
+        currentTau = start + delta * u; // linear in parameter space
+        broadcastRender({ instant: true });
+        if (u < 1) rafId = requestAnimationFrame(frame);
+      }
+      cancelAnimationFrame(rafId); rafId = requestAnimationFrame(frame);
+    }
+
+    // === Chart factory (used by both slides) ===
+    function createChart(svgSelector){
+      const svg = d3.select(svgSelector);
+      const W = +svg.attr('width');
+      const H = +svg.attr('height');
+      const margin = { top: 30, right: 20, bottom: 48, left: 58 };
+      const innerW = W - margin.left - margin.right;
+      const innerH = H - margin.top - margin.bottom;
+
+      const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+      // Parameters (common a,b,c,d; tau comes from shared state)
+      const params = { a: 20, b: 2.0, c: 2.0, d: 1.0 };
+      const xDomain = [0, 12];
+
+      const x = d3.scaleLinear().domain(xDomain).range([0, innerW]);
+      const y = d3.scaleLinear().domain([0, 24]).nice().range([innerH, 0]);
+
+      // Axes
+      g.append('g').attr('class', 'x-axis').attr('transform', `translate(0,${innerH})`).call(d3.axisBottom(x));
+      g.append('g').attr('class', 'y-axis').call(d3.axisLeft(y));
+      g.append('text').attr('x', innerW / 2).attr('y', innerH + 36).attr('text-anchor', 'middle').attr('fill', '#9ca3af').text('x');
+      g.append('text').attr('transform', 'rotate(-90)').attr('x', -innerH / 2).attr('y', -42).attr('text-anchor', 'middle').attr('fill', '#9ca3af').text('Marginal value');
+
+      const line = d3.line().x(d => x(d.x)).y(d => y(d.y));
+      const mbPath = g.append('path').attr('stroke', '#60a5fa').attr('fill', 'none').attr('stroke-width', 2.5);
+      const mcPath = g.append('path').attr('stroke', '#f59e0b').attr('fill', 'none').attr('stroke-width', 2.5);
+
+      const guideGroup = g.append('g').attr('class','guides');
+      const vGuide = guideGroup.append('line').attr('stroke','#6ee7b7').attr('stroke-width',1.5).attr('stroke-dasharray','6,6').attr('opacity',0.9);
+      const hGuide = guideGroup.append('line').attr('stroke','#6ee7b7').attr('stroke-width',1.0).attr('stroke-dasharray','4,4').attr('opacity',0.7);
+      const xStarLabel = guideGroup.append('text').attr('fill','#6ee7b7').style('font-size','12px').attr('dy', 14);
+      const yStarLabel = guideGroup.append('text').attr('fill','#6ee7b7').style('font-size','12px').attr('dx', 6).attr('dy', -6);
+
+      const focGroup = g.append('g');
+      const focDot = focGroup.append('circle').attr('r', 5).attr('fill', '#22c55e');
+      const focLabel = focGroup.append('text').attr('fill', '#22c55e').attr('dy', -10).style('font-size', '12px');
+
+      let hasDrawn = false;
+
+      function curveData(fn, tau) {
+        const n = 200;
+        return Array.from({ length: n }, (_, i) => {
+          const xi = xDomain[0] + (i / (n - 1)) * (xDomain[1] - xDomain[0]);
+          return { x: xi, y: fn(xi, { ...params, tau }) };
+        });
+      }
+
+      function solveFOC(tau, useWorker = false) {
+        return new Promise((resolve) => {
+          const f = (z) => MB(z, { ...params, tau }) - MC(z, { ...params, tau });
+          const lo = xDomain[0], hi = xDomain[1];
+          if (!useWorker) { resolve(bisect(f, lo, hi, 1e-6, 128)); }
+          else {
+            const handler = (ev) => { worker.removeEventListener('message', handler); resolve(ev.data.xStar); };
+            worker.addEventListener('message', handler);
+            worker.postMessage({ a: params.a, b: params.b, c: params.c, d: params.d, tau, lo, hi, tol: 1e-6, maxIter: 128 });
+          }
+        });
+      }
+
+      // Entrance draw animation for a path
+      function drawPathAnimated(sel, data, duration){
+        sel.datum(data).attr('d', line);
+        const len = sel.node().getTotalLength();
+        sel.attr('stroke-dasharray', `${len} ${len}`)
+           .attr('stroke-dashoffset', len)
+           .transition().duration(duration).ease(d3.easeLinear)
+           .attr('stroke-dashoffset', 0)
+           .on('end', () => sel.attr('stroke-dasharray', null).attr('stroke-dashoffset', null));
+      }
+
+      async function render(tau, opts={}) {
+        const { entrance=false, instant=false } = opts;
+        const mb = curveData(MB, tau);
+        const mc = curveData(MC, tau);
+
+        if (entrance) {
+          drawPathAnimated(mbPath, mb, 800);
+          setTimeout(() => drawPathAnimated(mcPath, mc, 800), 120);
+          hasDrawn = true;
+        } else if (!hasDrawn || instant) {
+          mbPath.datum(mb).attr('d', line);
+          mcPath.datum(mc).attr('d', line);
+          hasDrawn = true;
+        } else {
+          // keep updates instantaneous to maintain sync with guides/dot
+          mbPath.datum(mb).attr('d', line);
+          mcPath.datum(mc).attr('d', line);
+        }
+
+        const xStar = await solveFOC(tau, false);
+        const yStar = xStar == null ? null : MB(xStar, { ...params, tau });
+
+        if (xStar != null && isFinite(yStar)) {
+          const tx = x(xStar), ty = y(yStar);
+          focDot.attr('cx', tx).attr('cy', ty);
+          focLabel.text(`x*=${xStar.toFixed(2)}`).attr('x', tx).attr('y', ty);
+          vGuide.attr('x1', tx).attr('x2', tx).attr('y1', y(0)).attr('y2', ty);
+          hGuide.attr('x1', x(0)).attr('x2', tx).attr('y1', ty).attr('y2', ty);
+          xStarLabel.text('x*').attr('x', tx).attr('y', y(0));
+          yStarLabel.text('MB(x*)').attr('x', x(0)).attr('y', ty);
+        } else {
+          focDot.attr('cx', -999).attr('cy', -999);
+          focLabel.text('');
+          vGuide.attr('x1', -999).attr('x2', -999).attr('y1', -999).attr('y2', -999);
+          hGuide.attr('x1', -999).attr('x2', -999).attr('y1', -999).attr('y2', -999);
+          xStarLabel.text(''); yStarLabel.text('');
+        }
+      }
+
+      // Expose chart API
+      return { render };
+    }
+
+    // === App wiring ===
+    function createStageOverlay(){
+      const slidesRoot = document.querySelector('.reveal .slides');
+      const stage = document.createElement('div');
+      stage.id = 'stage-overlay';
+      stage.innerHTML = '<svg id="stage-svg" width="960" height="540"></svg>';
+      slidesRoot.appendChild(stage);
+      return stage;
+    }
+
+    function setStageVisibility(slide){
+      const stage = document.getElementById('stage-overlay');
+      const isFigure = !!(slide && slide.classList && slide.classList.contains('uses-stage'));
+      if (stage) stage.style.display = isFigure ? 'flex' : 'none';
+    }
+
+    function safeSyncToSlide(slide){
+      setStageVisibility(slide);
+      playing = false; if (typeof updatePlayButton === 'function') updatePlayButton();
+      const target = parseFloat(slide?.dataset?.targetTau ?? `${currentTau}`);
+      if (slide && slide.classList && slide.classList.contains('uses-stage')) {
+        animateTauTo(target, 1000);
+      }
+    }
+
+    // === App wiring ===
+    function startApp(){
+      // Create persistent overlay and single chart instance
+      createStageOverlay();
+      charts.push(createChart('#stage-svg'));
+      
+      
+
+      // Controls (slide 1)
+      const tauInput = document.getElementById('tau');
+      const playBtn = document.getElementById('play');
+      const resetBtn = document.getElementById('reset');
+      const animateInBtn = document.getElementById('animateIn');
+      const speedInput = document.getElementById('speed');
+      const speedVal = document.getElementById('speedVal');
+
+      function updatePlayButton(){ if (playBtn) playBtn.textContent = playing ? 'Pause' : 'Play'; }
+
+      function loop(t){
+        if (!playing) return;
+        if (!lastT) lastT = t;
+        const dt = (t - lastT) / 1000; // seconds
+        lastT = t;
+        const base = 0.5; // tau units per second
+        const s = speedInput ? parseFloat(speedInput.value) : 1;
+        const lo = tauInput ? parseFloat(tauInput.min) : -6;
+        const hi = tauInput ? parseFloat(tauInput.max) : 10;
+        currentTau += playDir * base * s * dt;
+        if (currentTau >= hi) { currentTau = hi; playDir = -1; }
+        if (currentTau <= lo) { currentTau = lo; playDir = 1; }
+        if (tauInput) tauInput.value = currentTau.toFixed(2);
+        broadcastRender({ instant: true });
+        rafId = requestAnimationFrame(loop);
+      }
+
+      tauInput?.addEventListener('input', () => { currentTau = parseFloat(tauInput.value); broadcastRender({ instant: true }); });
+      playBtn?.addEventListener('click', () => {
+        playing = !playing; updatePlayButton();
+        if (playing) { cancelAnimationFrame(rafId); lastT = 0; rafId = requestAnimationFrame(loop); }
+        else { cancelAnimationFrame(rafId); }
+      });
+      resetBtn?.addEventListener('click', () => { playing=false; updatePlayButton(); currentTau = 0; if (tauInput) tauInput.value = '0'; playDir = 1; broadcastRender({ entrance: true }); });
+      animateInBtn?.addEventListener('click', () => broadcastRender({ entrance: true }));
+      speedInput?.addEventListener('input', () => { if (speedVal) speedVal.textContent = `${parseFloat(speedInput.value).toFixed(2)}×`; });
+
+      // Ensure initial paths are drawn immediately (no need to click Animate In)
+      broadcastRender({ instant: true });
+
+      // Sync to slide target on ready & when changing slides
+      function syncToSlide(slide){
+        playing=false; updatePlayButton();
+        const target = parseFloat(slide?.dataset?.targetTau ?? `${currentTau}`);
+        animateTauTo(target, 1000);
+      }
+      Reveal.on('ready', e => { broadcastRender({ instant: true }); safeSyncToSlide(e.currentSlide); });
+      Reveal.on('slidechanged', e => safeSyncToSlide(e.currentSlide));
+
+      // --- Diagnostics ---
+      const runBtn = document.getElementById('run-tests');
+      const out = document.getElementById('test-results');
+      function row(name, pass, extra=''){ return `<div>${pass? '✅ <span class="ok">' : '❌ <span class="bad">'}${name}</span>${extra? ' — ' + extra : ''}</div>`; }
+      runBtn?.addEventListener('click', async () => {
+        const checks = [];
+        checks.push(row('Reveal loaded', !!window.Reveal));
+        checks.push(row('Reveal math plugin', !!(window.RevealMath && window.RevealMath.KaTeX)));
+        checks.push(row('KaTeX present', !!window.katex));
+        checks.push(row('D3 present', !!window.d3));
+        // initial path presence without Animate In
+        const mb1 = document.querySelector('#stage-svg path');
+        const hasD = !!mb1 && !!mb1.getAttribute('d');
+        checks.push(row('Initial MB path drawn (no click)', hasD));
+        // numeric check
+        const a=20,b=2,c=2,d=1,tau=0; const closed=(a-c-tau)/(b+d);
+        const num = bisect(z => (a-b*z)-(c+d*z+tau), 0, 12, 1e-7, 128);
+        checks.push(row('Bisection equals closed-form (tau=0)', Math.abs(num-closed)<1e-6, `num=${num?.toFixed(6)}, closed=${closed.toFixed(6)}`));
+        out.innerHTML = checks.join('');
+      });
+    }
+
+    function boot(){ ensureDeps().then(() => { initReveal(); startApp(); }); }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') boot();
+    else window.addEventListener('DOMContentLoaded', boot, { once:true });
+  })();
+  </script>
+</body>
+</html>
