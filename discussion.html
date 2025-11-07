@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robust Benchmarks in Optimal Taxation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root {
+            --sand-bg: #F5E6D3;
+            --dark-text: #2C1810;
+            --blue-concept: #2E86AB;
+            --red-concept: #A23B72;
+            --green-concept: #06A77D;
+            --orange-concept: #D97642;
+            --purple-concept: #6B4E71;
+        }
+
+        .reveal {
+            background-color: var(--sand-bg);
+            font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+        }
+
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            color: var(--dark-text);
+            text-transform: none;
+        }
+
+        .reveal p, .reveal li {
+            color: var(--dark-text);
+        }
+
+        .reveal .slides {
+            text-align: left;
+        }
+
+        .reveal h1, .reveal h2 {
+            text-align: center;
+        }
+
+        /* Color only for equation-description matching - no general colored text */
+
+        /* Chart styling */
+        .chart-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .axis path,
+        .axis line {
+            stroke: #666;
+            stroke-width: 1.5;
+        }
+
+        .axis text {
+            fill: #333;
+            font-size: 12px;
+        }
+
+        .grid line {
+            stroke: #e0e0e0;
+            stroke-width: 1;
+        }
+
+        .mb-curve {
+            stroke: var(--blue-concept);
+            stroke-width: 3;
+            fill: none;
+        }
+
+        .mc-curve {
+            stroke: var(--red-concept);
+            stroke-width: 3;
+            fill: none;
+        }
+
+        .optimal-point {
+            fill: var(--green-concept);
+            stroke: white;
+            stroke-width: 2;
+        }
+
+        .optimal-line {
+            stroke: var(--green-concept);
+            stroke-width: 2;
+            stroke-dasharray: 5,5;
+        }
+
+        /* Slider controls */
+        .controls {
+            background-color: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .control-group {
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .control-group label {
+            min-width: 140px;
+            color: var(--dark-text);
+        }
+
+        .control-group input[type="range"] {
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .control-group .value {
+            min-width: 50px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        /* Two column layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* Equation highlighting */
+        .eq-highlight {
+            background-color: rgba(46, 134, 171, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid var(--blue-concept);
+        }
+
+        /* Revenue effect boxes */
+        .revenue-box {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background-color: rgba(255,255,255,0.5);
+        }
+
+        .revenue-box-1 {
+            border-left: 4px solid var(--blue-concept);
+        }
+
+        .revenue-box-2 {
+            border-left: 4px solid var(--orange-concept);
+        }
+
+        /* CSS for equation element animations */
+        [data-id] {
+            transition: all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            display: inline-block;
+        }
+
+        .small-text {
+            font-size: 0.8em;
+        }
+
+        .tiny-text {
+            font-size: 0.65em;
+        }
+
+        /* Parameter explanation styles */
+        .param-group {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: rgba(255,255,255,0.3);
+            border-radius: 6px;
+        }
+
+        .param-group h5 {
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Title Slide -->
+            <section>
+                <h1>Robust Benchmarks in Optimal Taxation</h1>
+                <h3 style="margin-top: 60px;">How Parameter Uncertainty Shapes Tax Policy</h3>
+                <p style="text-align: center; margin-top: 80px; font-size: 0.9em;">
+                    Dylan T. Moore, Ashley C. Craig, & Thomas Lloyd
+                </p>
+            </section>
+
+            <!-- Overview -->
+            <section>
+                <h2>The Central Question</h2>
+                <p style="margin-top: 40px;">How should tax policy be designed when there is uncertainty about key parameters?</p>
+
+                <div style="margin-top: 60px;">
+                    <h4>Key Insight</h4>
+                    <p>Models with multidimensional heterogeneity can be reinterpreted as models of parameter uncertainty</p>
+                </div>
+
+                <div style="margin-top: 60px;">
+                    <h4>Surprising Finding</h4>
+                    <p>Uncertainty can make simple benchmarks optimal <em>ex ante</em>, even when they wouldn't be optimal <em>ex post</em></p>
+                </div>
+            </section>
+
+            <!-- Classic Result -->
+            <section>
+                <h2>The Classic Atkinson-Stiglitz Result</h2>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>Uniform commodity taxation is optimal when:</strong></p>
+                    <ul style="margin-top: 30px; margin-left: 40px;">
+                        <li style="margin: 20px 0;">Preferences over consumption goods are weakly separable from labor supply</li>
+                        <li style="margin: 20px 0;">Consumption subutility functions are homogeneous across agents</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 60px;">
+                    <h4>Violation → Tagging Opportunity</h4>
+                    <p class="small-text">If agents have different tastes, differentiated commodity taxes can serve as an indirect redistribution mechanism</p>
+                </div>
+            </section>
+
+            <!-- Tagging Explanation -->
+            <section>
+                <h2>The Tagging Rationale</h2>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>Recent Framework (Ferey et al. 2024):</strong></p>
+                    <p class="small-text" style="margin-top: 20px;">Optimal rate differentiation is proportional to the residual portion of consumption Engel curves not explained by causal income effects</p>
+                </div>
+
+                <div class="eq-highlight" style="margin-top: 40px;">
+                    <p style="text-align: center;">Different tastes across types → Differential taxation can improve efficiency</p>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h4>But what if the planner is uncertain about these taste differences?</h4>
+                </div>
+            </section>
+
+            <!-- Model Setup -->
+            <section>
+                <h2>Model Setup: Two Interpretations</h2>
+
+                <div class="two-col" style="margin-top: 40px;">
+                    <div>
+                        <h4 style="color: var(--purple-concept);">Heterogeneity Model</h4>
+                        <p class="small-text">Agents have types $(w, \theta)$</p>
+                        <p class="small-text">Distribution: $F_W(w|\theta)$</p>
+                        <p class="small-text">Planner knows joint distribution</p>
+                    </div>
+
+                    <div>
+                        <h4 style="color: var(--red-concept);">Uncertainty Model</h4>
+                        <p class="small-text">Agents have types $w$</p>
+                        <p class="small-text">State $\theta$ is uncertain</p>
+                        <p class="small-text">Planner has beliefs $\mu$ over $\theta$</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 60px;">
+                    <p class="small-text" style="text-align: center;">
+                        <strong>Key equivalence:</strong> As long as budget constraint holds <em>in expectation</em>,<br>
+                        these models are mathematically identical but conceptually different
+                    </p>
+                </div>
+            </section>
+
+            <!-- NEW SLIDE: The Parametric Model -->
+            <section>
+                <h2>The Parametric Model</h2>
+
+                <div style="margin-top: 30px;">
+                    <p>We work with a specific utility function:</p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center; font-size: 0.85em;">
+                            $$u(c,x,z;w) = \frac{c^{1-\gamma}}{1-\gamma} + \alpha(w)\frac{x^{1-\sigma}}{1-\sigma} - \psi\frac{(z/w)^{1+1/\varepsilon}}{1+1/\varepsilon}$$
+                        </p>
+                    </div>
+                </div>
+
+                <div class="two-col" style="margin-top: 30px; font-size: 0.85em;">
+                    <div>
+                        <div class="param-group">
+                            <h5 style="color: var(--blue-concept);">Consumption Utility</h5>
+                            <p>$c^{1-\gamma}/(1-\gamma)$: Standard CRRA</p>
+                            <p style="margin-top: 5px;"><strong>γ</strong> = risk aversion parameter</p>
+                        </div>
+
+                        <div class="param-group">
+                            <h5 style="color: var(--orange-concept);">Commodity Utility</h5>
+                            <p>$\alpha(w) x^{1-\sigma}/(1-\sigma)$: Taste for good $x$</p>
+                            <p style="margin-top: 5px;"><strong>σ</strong> = curvature parameter</p>
+                            <p style="margin-top: 5px;"><strong>α(w)</strong> = taste that varies with wage</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="param-group">
+                            <h5 style="color: var(--red-concept);">Labor Disutility</h5>
+                            <p>$\psi (z/w)^{1+1/\varepsilon}/(1+1/\varepsilon)$</p>
+                            <p style="margin-top: 5px;"><strong>ψ</strong> = disutility intensity</p>
+                            <p style="margin-top: 5px;"><strong>ε</strong> = Frisch elasticity</p>
+                        </div>
+
+                        <div class="param-group">
+                            <h5 style="color: var(--purple-concept);">Taste Heterogeneity</h5>
+                            <p>$\alpha(w) = \alpha_0 \cdot w^\beta$</p>
+                            <p style="margin-top: 5px;"><strong>α₀</strong> = base taste intensity</p>
+                            <p style="margin-top: 5px;"><strong>β</strong> = wage elasticity of taste</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Agent's Problem -->
+            <section>
+                <h2>The Agent's Problem</h2>
+
+                <div style="margin-top: 30px;">
+                    <p>Agent of type $w$ in state $\theta$ maximizes:</p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center;">$$u(c, x, z; w, \theta)$$</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <p>subject to budget constraint:</p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center;">$$c + x + \mathcal{T}_x(x) = z - \mathcal{T}_z(z)$$</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;" class="small-text">
+                    <p>$z$ = taxable income, $x$ = differentiated commodity, $c$ = numeraire consumption</p>
+                </div>
+            </section>
+
+            <!-- Two Stage Problem -->
+            <section>
+                <h2>Two-Stage Optimization</h2>
+
+                <div style="margin-top: 30px;">
+                    <div class="eq-highlight">
+                        <p><strong>Stage 2:</strong> Given income $z$, choose $x$</p>
+                        <p style="text-align: center; margin-top: 15px;">
+                            $$x(w,\theta;z) = \arg\max_{x} u(z - \mathcal{T}_z(z) - x - \mathcal{T}_x(x), x, z; w, \theta)$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <div class="eq-highlight">
+                        <p><strong>Stage 1:</strong> Choose optimal income $z$</p>
+                        <p class="tiny-text" style="text-align: center; margin-top: 15px;">
+                            $$z(w,\theta) = \arg\max_{z} u(z - \mathcal{T}_z(z) - x(w,\theta;z) - \mathcal{T}_x(x(w,\theta;z)), x(w,\theta;z), z; w, \theta)$$
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FOC Visualization Intro -->
+            <section>
+                <h2>Understanding the First-Order Conditions</h2>
+
+                <p style="margin-top: 40px;">The two-stage structure leads to two distinct FOCs:</p>
+
+                <div style="margin-top: 40px;" class="small-text">
+                    <div class="eq-highlight" style="border-color: var(--orange-concept);">
+                        <p><strong>Stage 2 FOC:</strong> Choosing $x$ given $z$</p>
+                        <p style="text-align: center; margin-top: 10px;">
+                            $$u_c \cdot (1 + \mathcal{T}_x'(x)) = u_x$$
+                        </p>
+                    </div>
+
+                    <div class="eq-highlight" style="margin-top: 20px; border-color: var(--blue-concept);">
+                        <p><strong>Stage 1 FOC:</strong> Choosing $z$ (accounting for induced $x$ changes)</p>
+                        <p style="text-align: center; margin-top: 10px;">
+                            $$u_c \left(1 - \mathcal{T}_z'(z) - \frac{\partial x}{\partial z}(1+\mathcal{T}_x'(x))\right) + u_x \frac{\partial x}{\partial z} = -u_z$$
+                        </p>
+                    </div>
+                </div>
+
+                <p style="margin-top: 40px; text-align: center;">Let's visualize these graphically...</p>
+            </section>
+
+            <!-- FOC Visualization with Diagrams -->
+            <section>
+                <h2 style="margin-bottom: 40px;">Visualizing the First-Order Conditions</h2>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; padding: 0 60px;">
+                    <!-- Stage 2 -->
+                    <div>
+                        <h3 style="text-align: center; color: var(--orange-concept); margin-bottom: 20px;">Stage 2: Choice of x</h3>
+
+                        <div style="font-size: 1.2em; text-align: center; margin-bottom: 30px;">
+                            $$u_c (1+\tau_x) = u_x$$
+                        </div>
+
+                        <svg width="700" height="500" viewBox="0 0 700 500" style="display: block; margin: 0 auto;">
+                            <!-- Axes -->
+                            <line x1="50" y1="450" x2="650" y2="450" stroke="#333" stroke-width="3"/>
+                            <line x1="50" y1="50" x2="50" y2="450" stroke="#333" stroke-width="3"/>
+
+                            <!-- MRS curve (blue, downward sloping) -->
+                            <path d="M 80,100 Q 200,150 350,250 Q 500,350 620,420"
+                                  stroke="#2E86AB" stroke-width="5" fill="none"/>
+
+                            <!-- Tax wedge line (red, horizontal) -->
+                            <line x1="50" y1="280" x2="650" y2="280"
+                                  stroke="#A23B72" stroke-width="5"/>
+
+                            <!-- Equilibrium point -->
+                            <circle cx="350" cy="280" r="12" fill="#06A77D"/>
+
+                            <!-- Labels -->
+                            <text x="350" y="480" text-anchor="middle" font-size="28" fill="#333">x</text>
+                            <text x="20" y="250" text-anchor="middle" font-size="28" fill="#333">Rate</text>
+
+                            <!-- Legend -->
+                            <text x="400" y="200" font-size="26" fill="#2E86AB">MRS: uₓ/uᴄ</text>
+                            <text x="400" y="240" font-size="26" fill="#A23B72">Tax: 1+τₓ</text>
+                        </svg>
+                    </div>
+
+                    <!-- Stage 1 -->
+                    <div>
+                        <h3 style="text-align: center; color: var(--blue-concept); margin-bottom: 20px;">Stage 1: Choice of z</h3>
+
+                        <div style="font-size: 1.1em; text-align: center; margin-bottom: 30px;">
+                            $$1-\tau_z - \frac{\partial x}{\partial z}(1+\tau_x) = -\frac{u_z}{u_c}$$
+                        </div>
+
+                        <svg width="700" height="500" viewBox="0 0 700 500" style="display: block; margin: 0 auto;">
+                            <!-- Axes -->
+                            <line x1="50" y1="450" x2="650" y2="450" stroke="#333" stroke-width="3"/>
+                            <line x1="50" y1="50" x2="50" y2="450" stroke="#333" stroke-width="3"/>
+
+                            <!-- Effective tax rate (blue, curved) -->
+                            <path d="M 80,350 Q 250,300 400,280 Q 550,260 620,250"
+                                  stroke="#2E86AB" stroke-width="5" fill="none"/>
+
+                            <!-- MRS curve (red, downward sloping steeper) -->
+                            <path d="M 80,120 Q 200,200 350,280 Q 500,360 620,420"
+                                  stroke="#A23B72" stroke-width="5" fill="none"/>
+
+                            <!-- Equilibrium point -->
+                            <circle cx="350" cy="280" r="12" fill="#06A77D"/>
+
+                            <!-- Labels -->
+                            <text x="350" y="480" text-anchor="middle" font-size="28" fill="#333">z</text>
+                            <text x="20" y="250" text-anchor="middle" font-size="28" fill="#333">Rate</text>
+
+                            <!-- Legend -->
+                            <text x="100" y="140" font-size="24" fill="#2E86AB">1-τz-∂x/∂z(1+τx)</text>
+                            <text x="450" y="360" font-size="24" fill="#A23B72">-uz/uc</text>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Model Comparison: Setup -->
+            <section>
+                <h2>Testing Atkinson-Stiglitz: Model Comparison</h2>
+
+                <div style="margin-top: 50px;">
+                    <p>We'll compare how choices respond to a wage increase from <strong>W = 2 → 3</strong> under two models:</p>
+                </div>
+
+                <div style="margin-top: 50px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <div class="eq-highlight" style="border-color: var(--blue-concept);">
+                        <h4 style="color: var(--blue-concept);">Model A: β = 0</h4>
+                        <p style="margin-top: 15px;">α(w) = α₀ (constant)</p>
+                        <p style="margin-top: 15px; font-size: 0.9em;">
+                            <strong>Atkinson-Stiglitz:</strong> Satisfied ✓
+                        </p>
+                        <p style="margin-top: 10px; font-size: 0.85em;">
+                            Commodity taste independent of wage
+                        </p>
+                    </div>
+
+                    <div class="eq-highlight" style="border-color: var(--purple-concept);">
+                        <h4 style="color: var(--purple-concept);">Model B: β > 0</h4>
+                        <p style="margin-top: 15px;">α(w) = α₀ · w^β</p>
+                        <p style="margin-top: 15px; font-size: 0.9em;">
+                            <strong>Atkinson-Stiglitz:</strong> Violated ✗
+                        </p>
+                        <p style="margin-top: 10px; font-size: 0.85em;">
+                            Higher wage → higher taste for x
+                        </p>
+                    </div>
+                </div>
+
+                <p style="margin-top: 50px; text-align: center; font-style: italic;">
+                    Do they respond differently to wage changes?
+                </p>
+            </section>
+
+            <!-- Model A: β = 0 Response -->
+            <section>
+                <h2 style="margin-bottom: 30px;">Model A: β = 0 (Atkinson-Stiglitz Satisfied)</h2>
+
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 0 50px; gap: 40px;">
+                    <!-- Equations -->
+                    <div style="flex: 1; padding-top: 80px;">
+                        <div style="background: rgba(46, 134, 171, 0.1); padding: 30px; border-radius: 10px; margin-bottom: 40px;">
+                            <h4 style="color: var(--blue-concept); margin-bottom: 20px;">Key Property:</h4>
+                            <div style="font-size: 1.4em; text-align: center;">
+                                $$\alpha(w) = \alpha_0$$
+                            </div>
+                            <p style="margin-top: 20px; text-align: center; font-size: 1.1em;">
+                                Taste for x is <strong>constant</strong>
+                            </p>
+                        </div>
+
+                        <div style="background: rgba(162, 59, 114, 0.1); padding: 30px; border-radius: 10px;">
+                            <h4 style="color: var(--purple-concept); margin-bottom: 20px;">Stage 2 FOC:</h4>
+                            <div style="font-size: 1.3em; text-align: center;">
+                                $$u_c (1+\tau_x) = \alpha_0 x^{-\sigma}$$
+                            </div>
+                            <p style="margin-top: 20px; text-align: center;">
+                                MRS curve <strong>does not shift</strong> with W
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Diagram -->
+                    <div style="flex: 1.5;">
+                        <h4 style="text-align: center; margin-bottom: 20px; font-size: 1.2em;">Effect of Wage Increase: W = 2 → W = 3</h4>
+
+                        <svg width="800" height="600" viewBox="0 0 800 600" style="display: block;">
+                            <!-- Axes -->
+                            <line x1="80" y1="550" x2="750" y2="550" stroke="#333" stroke-width="3"/>
+                            <line x1="80" y1="50" x2="80" y2="550" stroke="#333" stroke-width="3"/>
+
+                            <!-- MRS curve - SAME for both wages -->
+                            <path d="M 120,120 Q 250,180 400,300 Q 550,420 720,500"
+                                  stroke="#2E86AB" stroke-width="6" fill="none"/>
+
+                            <!-- Tax wedge (horizontal) -->
+                            <line x1="80" y1="350" x2="750" y2="350"
+                                  stroke="#A23B72" stroke-width="5"/>
+
+                            <!-- Equilibrium at W=2 (blue) -->
+                            <circle cx="320" cy="350" r="15" fill="#2E86AB" stroke="#fff" stroke-width="3"/>
+                            <text x="320" y="390" text-anchor="middle" font-size="28" fill="#2E86AB" font-weight="bold">W=2</text>
+
+                            <!-- Equilibrium at W=3 (green) -->
+                            <circle cx="480" cy="350" r="15" fill="#06A77D" stroke="#fff" stroke-width="3"/>
+                            <text x="480" y="390" text-anchor="middle" font-size="28" fill="#06A77D" font-weight="bold">W=3</text>
+
+                            <!-- Arrow showing movement -->
+                            <path d="M 345 360 L 455 360" stroke="#333" stroke-width="4" fill="none"
+                                  marker-end="url(#arrowhead)"/>
+                            <defs>
+                                <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                    <polygon points="0 0, 10 3, 0 6" fill="#333"/>
+                                </marker>
+                            </defs>
+
+                            <!-- Labels -->
+                            <text x="400" y="580" text-anchor="middle" font-size="32" fill="#333">x</text>
+                            <text x="40" y="300" text-anchor="middle" font-size="32" fill="#333">Rate</text>
+
+                            <!-- Legend -->
+                            <text x="500" y="200" font-size="28" fill="#2E86AB">MRS (same curve)</text>
+                            <text x="500" y="240" font-size="28" fill="#A23B72">Tax wedge: 1+τₓ</text>
+                        </svg>
+
+                        <p style="text-align: center; font-size: 1.2em; margin-top: 20px;">
+                            Higher W → <strong>higher income</strong> → move along same MRS curve → more x
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Model B: β > 0 Response -->
+            <section>
+                <h2 style="margin-bottom: 30px;">Model B: β > 0 (Atkinson-Stiglitz Violated)</h2>
+
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 0 50px; gap: 40px;">
+                    <!-- Equations -->
+                    <div style="flex: 1; padding-top: 80px;">
+                        <div style="background: rgba(106, 76, 147, 0.1); padding: 30px; border-radius: 10px; margin-bottom: 40px;">
+                            <h4 style="color: var(--purple-concept); margin-bottom: 20px;">Key Property:</h4>
+                            <div style="font-size: 1.4em; text-align: center;">
+                                $$\alpha(w) = \alpha_0 w^\beta$$
+                            </div>
+                            <p style="margin-top: 20px; text-align: center; font-size: 1.1em;">
+                                Taste for x <strong>increases with W</strong>
+                            </p>
+                        </div>
+
+                        <div style="background: rgba(162, 59, 114, 0.1); padding: 30px; border-radius: 10px;">
+                            <h4 style="color: var(--purple-concept); margin-bottom: 20px;">Stage 2 FOC:</h4>
+                            <div style="font-size: 1.3em; text-align: center;">
+                                $$u_c (1+\tau_x) = \alpha_0 w^\beta x^{-\sigma}$$
+                            </div>
+                            <p style="margin-top: 20px; text-align: center;">
+                                MRS curve <strong>shifts up</strong> with W
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Diagram -->
+                    <div style="flex: 1.5;">
+                        <h4 style="text-align: center; margin-bottom: 20px; font-size: 1.2em;">Effect of Wage Increase: W = 2 → W = 3</h4>
+
+                        <svg width="800" height="600" viewBox="0 0 800 600" style="display: block;">
+                            <!-- Axes -->
+                            <line x1="80" y1="550" x2="750" y2="550" stroke="#333" stroke-width="3"/>
+                            <line x1="80" y1="50" x2="80" y2="550" stroke="#333" stroke-width="3"/>
+
+                            <!-- MRS curve at W=2 (blue, dashed baseline) -->
+                            <path d="M 120,120 Q 250,180 400,300 Q 550,420 720,500"
+                                  stroke="#999" stroke-width="4" fill="none" stroke-dasharray="10,5" opacity="0.5"/>
+
+                            <!-- MRS curve at W=3 (green, SHIFTED UP due to higher α) -->
+                            <path d="M 120,80 Q 250,130 400,230 Q 550,330 720,410"
+                                  stroke="#06A77D" stroke-width="6" fill="none"/>
+
+                            <!-- Tax wedge (horizontal) -->
+                            <line x1="80" y1="350" x2="750" y2="350"
+                                  stroke="#A23B72" stroke-width="5"/>
+
+                            <!-- Equilibrium at W=2 (blue, dashed) -->
+                            <circle cx="320" cy="350" r="12" fill="none" stroke="#999" stroke-width="3" stroke-dasharray="5,3"/>
+
+                            <!-- Equilibrium at W=3 (green, on NEW curve) -->
+                            <circle cx="540" cy="350" r="15" fill="#06A77D" stroke="#fff" stroke-width="3"/>
+                            <text x="540" y="390" text-anchor="middle" font-size="28" fill="#06A77D" font-weight="bold">W=3</text>
+
+                            <!-- Arrow showing LARGER movement -->
+                            <path d="M 345 360 L 515 360" stroke="#333" stroke-width="4" fill="none"
+                                  marker-end="url(#arrowhead2)"/>
+                            <defs>
+                                <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                    <polygon points="0 0, 10 3, 0 6" fill="#333"/>
+                                </marker>
+                            </defs>
+
+                            <!-- Annotation for curve shift -->
+                            <text x="600" y="130" font-size="26" fill="#06A77D">↑ MRS shifts up</text>
+                            <text x="600" y="165" font-size="24" fill="#06A77D">(higher α)</text>
+
+                            <!-- Labels -->
+                            <text x="400" y="580" text-anchor="middle" font-size="32" fill="#333">x</text>
+                            <text x="40" y="300" text-anchor="middle" font-size="32" fill="#333">Rate</text>
+
+                            <!-- Legend -->
+                            <text x="100" y="480" font-size="24" fill="#999">--- W=2 (β=0 baseline)</text>
+                            <text x="500" y="480" font-size="28" fill="#06A77D">─ W=3 (new MRS)</text>
+                            <text x="500" y="520" font-size="28" fill="#A23B72">─ Tax: 1+τₓ</text>
+                        </svg>
+
+                        <p style="text-align: center; font-size: 1.2em; margin-top: 20px;">
+                            Higher W → <strong>both higher income AND higher taste</strong> → <strong>much more x</strong>
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- QDN Reform Introduction -->
+            <section data-auto-animate>
+                <h2>Characterizing Optimal Policy</h2>
+
+                <div style="margin-top: 40px;">
+                    <p>To find optimal tax policy, we consider marginal tax reforms</p>
+                </div>
+
+                <div style="margin-top: 60px;">
+                    <p><strong>Key Challenge:</strong></p>
+                    <p class="small-text">With multidimensional heterogeneity (or uncertainty),
+                    we can't construct fully distribution-neutral reforms</p>
+                </div>
+            </section>
+
+            <section data-auto-animate>
+                <h2>Characterizing Optimal Policy</h2>
+
+                <div class="eq-highlight" style="margin-top: 40px;">
+                    <h4 style="color: var(--reform);">Quasi-Distribution Neutral (QDN) Reforms</h4>
+                    <p class="small-text" style="margin-top: 20px;">
+                        A reform where the <strong>expected mechanical change</strong> in tax payments is zero at each income level:
+                    </p>
+                    <p style="text-align: center; margin-top: 20px; font-size: 1.2em;" data-id="qdn-def">
+                        $$\tau_z(z) = -\mathbb{E}[\tau_x(x(w,\theta)) \mid z(w,\theta) = z]$$
+                    </p>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p class="small-text">This isolates behavioral responses from mechanical revenue effects</p>
+                </div>
+            </section>
+
+            <!-- QDN Intuition -->
+            <section>
+                <h2>QDN Reform: Economic Intuition</h2>
+
+                <div style="margin-top: 30px;">
+                    <p>Consider a linear commodity tax reform: increase $t_x$ by 1 unit</p>
+                </div>
+
+                <div style="margin-top: 30px;" class="small-text">
+                    <p><strong>QDN condition requires:</strong> Reduce income tax at each $z$ by $\bar{x}'(z)$</p>
+
+                    <div style="margin-top: 30px; margin-left: 40px;">
+                        <p>where $\bar{x}'(z) = \mathbb{E}[x(w,\theta) \mid z(w,\theta) = z]$</p>
+                        <p style="margin-top: 15px;">is the <strong>average</strong> consumption of $x$ at income level $z$</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p class="small-text"><strong>Result:</strong> On average, taxpayers at each income level can still afford their original bundle</p>
+                </div>
+            </section>
+
+            <!-- Derivation Setup with equation animation -->
+            <section data-auto-animate>
+                <h2>The Key Equation: Setup</h2>
+
+                <div style="margin-top: 40px;">
+                    <p>Consider the <strong>first-stage FOC</strong> for choosing $z$:</p>
+                    <div class="eq-highlight">
+                        <div style="text-align: center; font-size: 1.3em;">
+                            <span data-id="uc">$u_c$</span>
+                            <span data-id="bracket-l">$($</span>
+                            <span data-id="one">$1$</span>
+                            <span data-id="minustz">$- \mathcal{T}_z'(z)$</span>
+                            <span data-id="minusdx">$- \frac{\partial x}{\partial z}(1+t_x)$</span>
+                            <span data-id="bracket-r">$)$</span>
+                            <span data-id="plusux">$+ u_x \frac{\partial x}{\partial z}$</span>
+                            <span data-id="equals">$=$</span>
+                            <span data-id="minusuz">$-u_z$</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p>Note: $\frac{\partial x}{\partial z}(1+t_x)$ represents how the commodity tax effectively alters the marginal income tax rate</p>
+                </div>
+            </section>
+
+            <section data-auto-animate>
+                <h2>The Key Equation: Rearrangement</h2>
+
+                <div style="margin-top: 20px;">
+                    <p class="small-text">Rearranging the FOC:</p>
+                    <div class="eq-highlight">
+                        <div style="text-align: center; font-size: 0.9em;">
+                            <span data-id="one">$1$</span>
+                            <span data-id="minustz">$- \mathcal{T}_z'(z)$</span>
+                            <span data-id="minusdx">$- \frac{\partial x}{\partial z}(1+t_x)$</span>
+                            <span data-id="equals">$=$</span>
+                            <span data-id="minusuz">$-\frac{u_z}{u_c}$</span>
+                            <span data-id="plusux">$- \frac{\partial x}{\partial z}\frac{u_x}{u_c}$</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <p class="small-text">Under a QDN reform (increase $t_x$ by $\kappa$, reduce $\mathcal{T}_z'(z)$ by $\bar{x}'(z)\kappa$):</p>
+                    <div class="eq-highlight">
+                        <div class="tiny-text" style="text-align: center;">
+                            <span data-id="one">$1$</span>
+                            <span data-id="minustz">$- \mathcal{T}_z'(z)$</span>
+                            <span data-id="plusxbar" style="color: var(--reform);">$+ \bar{x}'(z)\kappa$</span>
+                            <span data-id="minusdx">$- \frac{\partial x}{\partial z}(1+t_x+\kappa)$</span>
+                            <span data-id="equals">$=$</span>
+                            <span data-id="minusuz">$-\frac{u_z}{u_c}$</span>
+                            <span data-id="plusux">$- \frac{\partial x}{\partial z}\frac{u_x}{u_c}$</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section data-auto-animate>
+                <h2>The Key Equation: Heterogeneity Term</h2>
+
+                <div style="margin-top: 20px;" class="tiny-text">
+                    <p>Simplifying the QDN-reformed FOC:</p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center;">
+                            $$1 - \mathcal{T}_z'(z) - \frac{\partial x}{\partial z}(1+t_x) + \underbrace{\left[\bar{x}'(z) - \frac{\partial x}{\partial z}\right]}_{\equiv \bar{x}'_{het}(z;\theta)}\kappa = -\frac{u_z}{u_c} - \frac{\partial x}{\partial z}\frac{u_x}{u_c}$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <p class="small-text"><strong>Key insight:</strong> A marginal QDN reform decreases the effective marginal income tax rate by $\bar{x}'_{het}(z;\theta)$</p>
+                </div>
+
+                <div style="margin-top: 30px;" class="small-text">
+                    <p>where $\bar{x}'_{het}(z;\theta) = \bar{x}'(z) - x'_{inc}(z;\theta)$</p>
+                    <p style="margin-top: 10px; margin-left: 40px;">
+                        $\bar{x}'(z)$ = average marginal propensity to consume $x$ at income $z$<br>
+                        $x'_{inc}(z;\theta)$ = causal income effect in state $\theta$
+                    </p>
+                </div>
+            </section>
+
+            <!-- IMPROVED Response decomposition -->
+            <section>
+                <h2>Behavioral Responses to QDN Reform</h2>
+
+                <div style="margin-top: 30px;" class="small-text">
+                    <p><strong>Expected increase in taxable income:</strong></p>
+                    <div class="eq-highlight" style="border-color: var(--blue-concept);">
+                        <p style="text-align: center;">
+                            $$\frac{z\varepsilon_z(z;\theta)}{1-\mathcal{T}_z'(z)} \bar{x}'_{het}(z;\theta)$$
+                        </p>
+                    </div>
+
+                    <p style="margin-top: 30px;"><strong>This generates revenue from TWO sources:</strong></p>
+
+                    <div class="revenue-box revenue-box-1">
+                        <p><strong>1. Direct income tax revenue:</strong></p>
+                        <div style="text-align: center; margin-top: 10px; font-size: 0.9em;">
+                            $$\mathcal{T}_z'(z) \cdot \frac{z\varepsilon_z(z;\theta)}{1-\mathcal{T}_z'(z)} \bar{x}'_{het}(z;\theta)$$
+                        </div>
+                    </div>
+
+                    <div class="revenue-box revenue-box-2">
+                        <p><strong>2. Cross-base effects</strong> (change in $z$ induces change in $x$):</p>
+                        <div style="text-align: center; margin-top: 10px; font-size: 0.9em;">
+                            $$t_x \cdot x'_{inc}(z;\theta) \cdot \frac{z\varepsilon_z(z;\theta)}{1-\mathcal{T}_z'(z)} \bar{x}'_{het}(z;\theta)$$
+                        </div>
+                        <p style="margin-top: 10px; font-style: italic; text-align: center;">↑ Extra z → Extra x → Extra tax on x</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cost-Benefit Equation -->
+            <section>
+                <h2>Optimal Policy Condition</h2>
+
+                <div style="margin-top: 30px;" class="tiny-text">
+                    <p>At the optimum, marginal QDN reforms must have zero welfare effect:</p>
+
+                    <div class="eq-highlight">
+                        <p><strong style="color: var(--red-concept);">Marginal Cost</strong> (efficiency loss from taxing $x$):</p>
+                        <p style="text-align: center; margin-top: 10px;">
+                            $$t_x \cdot \mathbb{E}\left[\frac{\varepsilon_{x|z}(z;\theta) x(z;\theta)}{1+t_x}\right]$$
+                        </p>
+                    </div>
+
+                    <div class="eq-highlight" style="margin-top: 20px;">
+                        <p><strong style="color: var(--green-concept);">Marginal Benefit</strong> (revenue from behavioral responses):</p>
+                        <p style="text-align: center; margin-top: 10px; font-size: 0.75em;">
+                            $$\int \mathcal{T}_z'(z) \frac{\bar{\varepsilon}_z(z) z}{1-\mathcal{T}_z'(z)} \bar{x}'_{het}(z) h_z(z) dz + \int t_x \mathbb{E}\left[x'_{inc}(z;\theta) \frac{\varepsilon_z(z;\theta) z}{1-\mathcal{T}_z'(z)} \bar{x}'_{het}(z) \mid z\right] h_z(z) dz$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <p class="small-text"><strong>Key point:</strong> This is <em>not</em> just the expected value of components — covariances matter!</p>
+                </div>
+            </section>
+
+            <!-- Uncertainty enters -->
+            <section data-auto-animate>
+                <h2>Where Does Uncertainty Enter?</h2>
+
+                <div style="margin-top: 40px;">
+                    <p>Expanding the optimal policy condition reveals covariance terms:</p>
+
+                    <div class="eq-highlight" style="margin-top: 30px; font-size: 0.7em;">
+                        <p style="text-align: center;" data-id="expanded">
+                            $$t_x = \frac{\text{benefit from using mean parameters}}{\text{cost from using mean parameters} + \text{uncertainty penalty}}$$
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section data-auto-animate>
+                <h2>Where Does Uncertainty Enter?</h2>
+
+                <div style="margin-top: 20px; font-size: 0.55em;">
+                    <p>The full expression:</p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center; line-height: 1.8;" data-id="expanded">
+                            $$t_x = \frac{\int \mathcal{T}_z'(z) \frac{\bar{\varepsilon}_z(z) z}{1-\mathcal{T}_z'(z)} \bar{x}'_{het}(z) h_z(z) dz}{\mathbb{E}\left[\frac{\varepsilon_{x|z} x}{1+t_x}\right] - \int \bar{x}'_{inc}(z) \frac{\bar{\varepsilon}_z(z) z}{1-\mathcal{T}_z'(z)} \bar{x}'_{het}(z) h_z(z) dz + \color{#A23B72}{\int \frac{\bar{\varepsilon}_z(z) z}{1-\mathcal{T}_z'(z)} \mathbb{V}[x'_{inc}(z;\theta) \mid z] h_z(z) dz}}$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <p class="small-text">The variance term in the denominator represents the <strong>uncertainty penalty</strong></p>
+                </div>
+            </section>
+
+            <!-- The variance attenuation effect -->
+            <section>
+                <h2>The Variance Attenuation Effect</h2>
+
+                <div style="margin-top: 30px;" class="small-text">
+                    <p><strong>Why does variance in $x'_{inc}$ push toward uniformity?</strong></p>
+
+                    <div style="margin-top: 30px; margin-left: 20px;">
+                        <p>The causal income effect $x'_{inc}(z;\theta)$ plays two opposing roles:</p>
+
+                        <div style="margin-top: 20px;">
+                            <p>1. Determines how much the incentive to earn changes under QDN reform</p>
+                            <p style="margin-left: 40px; margin-top: 5px;">via $\bar{x}'_{het}(z;\theta) = \bar{x}'(z) - x'_{inc}(z;\theta)$</p>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <p>2. Determines the cross-base response of $x$ to changes in $z$</p>
+                        </div>
+                    </div>
+
+                    <div class="eq-highlight" style="margin-top: 30px; border-color: var(--uncertainty);">
+                        <p style="text-align: center;">
+                            $$\mathbb{C}[x'_{inc}(z;\theta), \bar{x}'_{het}(z;\theta) \mid z] = -\mathbb{V}[x'_{inc}(z;\theta) \mid z] < 0$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <p class="small-text"><strong>Intuition:</strong> When incentive changes are large, behavioral responses are small, and vice versa</p>
+                </div>
+            </section>
+
+            <!-- Main Result -->
+            <section>
+                <h2>Main Result</h2>
+
+                <div class="eq-highlight" style="margin-top: 40px; border-color: var(--green-concept);">
+                    <p style="text-align: center; font-size: 1.3em;">
+                        As uncertainty about causal income effects grows,<br>
+                        optimal commodity taxation approaches the<br>
+                        Atkinson-Stiglitz uniform benchmark
+                    </p>
+                </div>
+
+                <div style="margin-top: 50px;">
+                    <p><strong>This is NOT due to:</strong></p>
+                    <ul style="margin-left: 40px; margin-top: 20px;">
+                        <li>Planner risk aversion</li>
+                        <li>Inability to tagging in any particular state</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>This IS due to:</strong></p>
+                    <ul style="margin-left: 40px; margin-top: 20px;">
+                        <li>Negative covariance between incentive changes and behavioral responses</li>
+                        <li>Fundamental tension in the dual role of income effects</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Reinterpreting AS -->
+            <section>
+                <h2>Reinterpreting Atkinson-Stiglitz</h2>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>Traditional view:</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        Uniform commodity taxation follows from strong functional form assumptions about preferences
+                    </p>
+                </div>
+
+                <div style="margin-top: 50px;">
+                    <p><strong>New perspective:</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        Uniformity can arise from informational considerations
+                    </p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        Rate differentiation may be attractive <em>in principle</em>, but planner uncertainty undermines its appeal <em>in practice</em>
+                    </p>
+                </div>
+
+                <div style="margin-top: 60px; padding: 20px; background-color: rgba(6, 167, 125, 0.1); border-radius: 8px;">
+                    <p style="text-align: center;">
+                        <strong>A robust benchmark emerges from uncertainty, not from strong assumptions</strong>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Broader implications -->
+            <section>
+                <h2>Broader Implications</h2>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>Not all benchmarks are reinforced by uncertainty:</strong></p>
+
+                    <div style="margin-top: 30px; margin-left: 40px;" class="small-text">
+                        <p>Pigouvian taxation:</p>
+                        <p style="margin-left: 40px; margin-top: 10px;">
+                            • Atmospheric externalities <em>ex post</em><br>
+                            • But <em>ex ante</em>, all externalities are non-atmospheric<br>
+                            • Uncertainty complicates optimal corrective taxation
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>General principle:</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        Parameter uncertainty can either simplify or complicate optimal policy, depending on the structure of the problem
+                    </p>
+                </div>
+            </section>
+
+            <!-- Conclusion -->
+            <section>
+                <h2>Conclusion</h2>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>Key contributions:</strong></p>
+                    <ul style="margin-left: 40px; margin-top: 20px; line-height: 2;">
+                        <li>Reinterpret multidimensional heterogeneity models as uncertainty models</li>
+                        <li>Characterize optimal policy under parameter uncertainty using QDN reforms</li>
+                        <li>Show that uncertainty creates systematic force toward simple benchmarks in commodity taxation</li>
+                        <li>Provide new perspective on classic Atkinson-Stiglitz result</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 60px; padding: 30px; background-color: rgba(46, 134, 171, 0.1); border-radius: 8px; border-left: 4px solid var(--blue-concept);">
+                    <p style="text-align: center; font-size: 1.1em;">
+                        <strong>When planners are uncertain about the world,<br>
+                        robust simplicity can dominate tailored complexity</strong>
+                    </p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        // Initialize Reveal.js with 16:9 aspect ratio and proportional scaling
+        Reveal.initialize({
+            hash: true,
+            transition: 'slide',
+            transitionSpeed: 'default',
+            center: false,
+            width: 1920,           // 16:9 aspect ratio
+            height: 1080,          // 16:9 aspect ratio
+            margin: 0,             // No margin for strict 16:9
+            minScale: 0.2,         // Minimum scale factor
+            maxScale: 2.0,         // Maximum scale factor
+            autoAnimate: true,
+            autoAnimateEasing: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
+            autoAnimateDuration: 0.8,
+            autoAnimateUnmatched: false
+        });
+
+        // Render math
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+        });
+
+        Reveal.on('slidechanged', () => {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+        });
+
+        // All visualizations are now hand-drawn SVG diagrams
+        // No interactive D3.js charts or JavaScript calculations needed
+    </script>
+</body>
+</html>
