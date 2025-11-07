@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Can Bunching Teach Us About Tagging?</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <style>
+        :root {
+            --sand-bg: #F5E6D3;
+            --dark-text: #2C1810;
+            --blue-concept: #2E86AB;
+            --red-concept: #A23B72;
+            --green-concept: #06A77D;
+            --orange-concept: #D97642;
+            --purple-concept: #6B4E71;
+        }
+
+        .reveal {
+            background-color: var(--sand-bg);
+            font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+        }
+
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            color: var(--dark-text);
+            text-transform: none;
+        }
+
+        .reveal p, .reveal li {
+            color: var(--dark-text);
+        }
+
+        .reveal .slides {
+            text-align: left;
+        }
+
+        .reveal h1, .reveal h2 {
+            text-align: center;
+        }
+
+        /* Conceptual color coding */
+        .heterogeneity { color: var(--purple-concept); font-weight: bold; }
+        .identification { color: var(--green-concept); font-weight: bold; }
+        .bunching { color: var(--red-concept); font-weight: bold; }
+        .tagging { color: var(--orange-concept); font-weight: bold; }
+
+        /* Two column layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* Equation highlighting */
+        .eq-highlight {
+            background-color: rgba(46, 134, 171, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid var(--blue-concept);
+        }
+
+        /* Revenue effect boxes */
+        .revenue-box {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background-color: rgba(255,255,255,0.5);
+        }
+
+        .revenue-box-1 {
+            border-left: 4px solid var(--blue-concept);
+        }
+
+        .revenue-box-2 {
+            border-left: 4px solid var(--orange-concept);
+        }
+
+        /* CSS for equation element animations */
+        [data-id] {
+            transition: all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            display: inline-block;
+        }
+
+        .small-text {
+            font-size: 0.8em;
+        }
+
+        .tiny-text {
+            font-size: 0.65em;
+        }
+
+        /* Parameter explanation styles */
+        .param-group {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: rgba(255,255,255,0.3);
+            border-radius: 6px;
+        }
+
+        .param-group h5 {
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        /* Result box */
+        .result-box {
+            padding: 20px;
+            margin: 20px 0;
+            background-color: rgba(6, 167, 125, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid var(--green-concept);
+        }
+
+        /* Auto-fit improvements - shrink to fit instead of scrolling */
+        .reveal .slides section {
+            height: 100%;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 30px 50px;
+            box-sizing: border-box;
+        }
+
+        /* Auto-scale content to fit */
+        .reveal .slides section.present {
+            transform-origin: center center;
+        }
+
+        /* Better text scaling */
+        .reveal p, .reveal li {
+            margin: 8px 0;
+            line-height: 1.4;
+            font-size: 0.9em;
+        }
+
+        .reveal h1 {
+            font-size: 2.2em;
+            margin-bottom: 0.5em;
+        }
+
+        .reveal h2 {
+            font-size: 1.8em;
+            margin-bottom: 0.8em;
+        }
+
+        .reveal h3 {
+            font-size: 1.4em;
+            margin-bottom: 0.5em;
+        }
+
+        .reveal h4 {
+            font-size: 1.1em;
+            margin-bottom: 0.5em;
+        }
+
+        .reveal ul, .reveal ol {
+            margin: 10px 0;
+        }
+
+        .reveal li {
+            margin: 5px 0;
+        }
+
+        /* Equation improvements */
+        .eq-highlight {
+            padding: 12px 15px;
+            margin: 12px 0;
+            max-width: 100%;
+            overflow-x: auto;
+            box-sizing: border-box;
+        }
+
+        .eq-highlight p {
+            margin: 8px 0;
+        }
+
+        /* Better KaTeX scaling - larger equations */
+        .katex {
+            font-size: 1.1em;
+        }
+
+        .katex-display {
+            font-size: 1.0em;
+            overflow-x: auto;
+            overflow-y: hidden;
+            max-width: 100%;
+            margin: 0.5em 0;
+        }
+
+        .small-text .katex-display {
+            font-size: 0.85em;
+        }
+
+        .tiny-text .katex-display {
+            font-size: 0.75em;
+        }
+
+        /* Compact spacing for dense slides */
+        .small-text {
+            font-size: 0.75em;
+            line-height: 1.3;
+        }
+
+        .tiny-text {
+            font-size: 0.6em;
+            line-height: 1.2;
+        }
+
+        /* Two-column layout optimization */
+        .two-col {
+            gap: 20px;
+        }
+
+        /* Boxes and groups */
+        .param-group {
+            margin: 12px 0;
+            padding: 12px;
+        }
+
+        .param-group p {
+            margin: 6px 0;
+            font-size: 0.85em;
+        }
+
+        .revenue-box {
+            padding: 12px;
+            margin: 10px 0;
+        }
+
+        .result-box {
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        /* Ensure content fits in viewport - 16:9 ratio */
+        .reveal .slides {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Responsive font sizing for smaller screens */
+        @media (max-width: 1200px) {
+            .reveal {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .reveal {
+                font-size: 24px;
+            }
+
+            .two-col {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Title Slide -->
+            <section>
+                <h1>What Can Bunching Teach Us About Tagging?</h1>
+                <h3 style="margin-top: 60px;">Identifying <span class="heterogeneity">Preference Heterogeneity</span> from Tax Kinks</h3>
+                <p style="text-align: center; margin-top: 80px; font-size: 0.9em;">
+                    Dylan T. Moore<br>
+                    <span style="font-size: 0.9em;">University of Hawaii at Manoa</span>
+                </p>
+            </section>
+
+            <!-- Overview -->
+            <section>
+                <h2>The Central Question</h2>
+                <p style="margin-top: 40px;">Can we use <span class="bunching">bunching behavior</span> at tax kinks to identify whether <span class="tagging">differentiated commodity taxation</span> is warranted?</p>
+
+                <div style="margin-top: 60px;">
+                    <h4>Key Insight</h4>
+                    <p>Discontinuities in consumption patterns at tax bracket thresholds reveal <span class="heterogeneity">preference heterogeneity</span> needed for optimal tagging</p>
+                </div>
+
+                <div style="margin-top: 60px;">
+                    <h4>Surprising Finding</h4>
+                    <p><span class="identification">Point identification</span> of tagging-relevant parameters is possible even when the ETI is not identified from bunching alone</p>
+                </div>
+            </section>
+
+            <!-- Motivation -->
+            <section>
+                <h2>Why This Matters</h2>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>Standard bunching literature:</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        Focuses on identifying elasticity of taxable income (ETI) from bunching mass
+                    </p>
+                </div>
+
+                <div style="margin-top: 50px;">
+                    <p><strong>This paper:</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        Looks at <em>other consumption choices</em> (good $x$) around tax kinks
+                    </p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        These patterns reveal whether different income groups have different preferences
+                    </p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        This information determines optimal <span class="tagging">commodity tax differentiation</span>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Model Setup -->
+            <section>
+                <h2>Model Setup: Agent Types</h2>
+
+                <div style="margin-top: 30px;">
+                    <p>A continuum of agents, each characterized by type $(w, \theta)$:</p>
+                </div>
+
+                <div class="two-col" style="margin-top: 40px;">
+                    <div>
+                        <div class="param-group">
+                            <h5 style="color: var(--blue-concept);">Productivity Dimension</h5>
+                            <p>$w \in W \subseteq \mathbb{R}_{++}$</p>
+                            <p style="margin-top: 10px;">Captures earning ability / wage</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="param-group">
+                            <h5 style="color: var(--purple-concept);">Preference Dimension</h5>
+                            <p>$\theta \in \Theta$</p>
+                            <p style="margin-top: 10px;"><span class="heterogeneity">Preference heterogeneity</span> beyond productivity</p>
+                            <p class="small-text" style="margin-top: 10px;">$\Theta$ can be discrete, continuous, or mixed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p class="small-text">Population distribution: $f_w(w|\theta)$ with measure $\mu$ over $\Theta$</p>
+                </div>
+            </section>
+
+            <!-- Agent's Problem -->
+            <section>
+                <h2>The Agent's Problem</h2>
+
+                <div style="margin-top: 30px;">
+                    <p>Agent of type $(w,\theta)$ chooses:</p>
+                    <ul style="margin-left: 40px; margin-top: 20px;">
+                        <li>$z$: taxable income</li>
+                        <li>$x$: consumption of some differentiated good</li>
+                        <li>$c$: consumption of numeraire good</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <p>Maximizes utility:</p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center;">$$\max_{z,x,c} \quad u(c, x, z; w, \theta)$$</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <p>Subject to budget constraint:</p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center;">$$c + x + \mathcal{T}_x(x) = z - \mathcal{T}_z(z)$$</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Two-Stage Problem -->
+            <section>
+                <h2>Two-Stage Optimization</h2>
+
+                <div style="margin-top: 30px;">
+                    <div class="eq-highlight">
+                        <p><strong>Stage 2:</strong> Given income $z$, choose $x$</p>
+                        <p style="text-align: center; margin-top: 15px;">
+                            $$x(w,\theta;z) = \arg\max_{x} u(z - \mathcal{T}_z(z) - x - \mathcal{T}_x(x), x, z; w, \theta)$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <div class="eq-highlight">
+                        <p><strong>Stage 1:</strong> Choose optimal income $z$</p>
+                        <p class="tiny-text" style="text-align: center; margin-top: 15px;">
+                            $$z(w,\theta) = \arg\max_{z} u(z - \mathcal{T}_z(z) - x(w,\theta;z) - \mathcal{T}_x(x(w,\theta;z)), x(w,\theta;z), z; w, \theta)$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <p class="small-text">Actual consumption: $x(w,\theta) \equiv x(w,\theta; z(w,\theta))$</p>
+                </div>
+            </section>
+
+            <!-- First-Order Conditions -->
+            <section>
+                <h2>First-Order Conditions</h2>
+
+                <div style="margin-top: 40px;" class="small-text">
+                    <div class="eq-highlight" style="border-color: var(--orange-concept);">
+                        <p><strong>Stage 2 FOC:</strong> Choosing $x$ given $z$</p>
+                        <p style="text-align: center; margin-top: 10px;">
+                            $$1 + \mathcal{T}_x'(x) = \frac{u_x}{u_c}$$
+                        </p>
+                        <p class="small-text" style="margin-top: 10px; text-align: center;">Marginal rate of substitution equals relative price</p>
+                    </div>
+
+                    <div class="eq-highlight" style="margin-top: 20px; border-color: var(--blue-concept);">
+                        <p><strong>Stage 1 FOC:</strong> Choosing $z$</p>
+                        <p style="text-align: center; margin-top: 10px;">
+                            $$1 - \mathcal{T}_z'(z) = -\frac{u_z}{u_c}$$
+                        </p>
+                        <p class="small-text" style="margin-top: 10px; text-align: center;">Marginal rate of substitution between income and consumption</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Optimal Tagging Framework -->
+            <section>
+                <h2>Optimal <span class="tagging">Commodity Tax Differentiation</span></h2>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>Classic result (Atkinson-Stiglitz):</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        Uniform commodity taxation is optimal when preferences are homogeneous across types
+                    </p>
+                </div>
+
+                <div style="margin-top: 50px;">
+                    <p><strong>Recent framework (Ferey, Lockwood, & Taubinsky 2024):</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        Rate differentiation is proportional to <span class="heterogeneity">residual Engel curve variation</span> not explained by causal income effects
+                    </p>
+                </div>
+
+                <div style="margin-top: 50px;">
+                    <p class="small-text" style="text-align: center;">
+                        <strong>Question:</strong> Can we identify these residuals from observable data?
+                    </p>
+                </div>
+            </section>
+
+            <!-- QDN Reform Introduction -->
+            <section data-auto-animate>
+                <h2>Quasi-Distribution Neutral Reforms</h2>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>Definition:</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        A reform where the <strong>expected mechanical change</strong> in tax payments is zero at each income level
+                    </p>
+                </div>
+
+                <div class="eq-highlight" style="margin-top: 40px;">
+                    <p style="text-align: center; font-size: 1.2em;" data-id="qdn-def">
+                        $$\tau_z(z) = -\mathbb{E}[\tau_x(x(w,\theta)) \mid z(w,\theta) = z]$$
+                    </p>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p class="small-text">This isolates <span class="tagging">behavioral responses</span> from mechanical revenue effects</p>
+                </div>
+            </section>
+
+            <section data-auto-animate>
+                <h2>Quasi-Distribution Neutral Reforms</h2>
+
+                <div style="margin-top: 30px;">
+                    <p><strong>Intuition for linear commodity tax:</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        Increase tax on $x$ by $\kappa$
+                    </p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 10px;">
+                        Reduce income tax at each $z$ by $\bar{x}'(z) \cdot \kappa$
+                    </p>
+                    <p class="small-text" style="margin-left: 60px; margin-top: 10px;">
+                        where $\bar{x}'(z) = \mathbb{E}[x(w,\theta) \mid z(w,\theta) = z]$ is average consumption at income $z$
+                    </p>
+                </div>
+
+                <div class="result-box" style="margin-top: 40px;">
+                    <p style="text-align: center;"><strong>Result:</strong> On average, taxpayers at each income level can still afford their original bundle</p>
+                </div>
+            </section>
+
+            <!-- Optimal Policy Formula -->
+            <section>
+                <h2>Optimal Linear Commodity Tax</h2>
+
+                <div style="margin-top: 20px; font-size: 0.55em;">
+                    <p>Under QDN reforms, the optimal tax rate $t_x$ satisfies:</p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center; line-height: 1.8;">
+                            $$t_x = \frac{\int \mathcal{T}_z'(z) \frac{1+t_x}{1-\mathcal{T}_z'(z)} \left(\frac{\bar{x}'(z)\bar{\varepsilon}_z(z) - \mathbb{E}[x'_{inc}(z;\theta)\varepsilon_z(z;\theta)|z]}{\mathbb{E}[x(z;\theta)\varepsilon_{x|z}(z;\theta)]}\right) z h_z(z) dz}{1 + \int \frac{1+t_x}{1-\mathcal{T}_z'(z)} \left(\frac{\mathbb{E}[x'^2_{inc}(z;\theta)\varepsilon_z(z;\theta)|z] - \bar{x}'(z)\mathbb{E}[x'_{inc}(z;\theta)\varepsilon_z(z;\theta)|z]}{\mathbb{E}[x(z;\theta)\varepsilon_{x|z}(z;\theta)]}\right) z h_z(z) dz}$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <p class="small-text"><strong>Key term:</strong> $\mathbb{E}[x'_{inc}(z;\theta)\varepsilon_z(z;\theta)|z]$</p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 10px;">
+                        This is a sufficient statistic for optimal policy
+                    </p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 10px;">
+                        Can we identify it from observable data?
+                    </p>
+                </div>
+            </section>
+
+            <!-- The Setting: Tax Kinks -->
+            <section>
+                <h2>The Setting: <span class="bunching">Tax Bracket Thresholds</span></h2>
+
+                <div style="margin-top: 30px;">
+                    <p>Consider a piecewise linear income tax:</p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center;">
+                            $$T(z) = \begin{cases}
+                            t_0 z & \text{if } z \leq z^* \\
+                            t_1(z - z^*) + t_0 z^* & \text{if } z > z^*
+                            \end{cases}$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p>where $t_1 > t_0$ and $z^*$ is the bracket threshold</p>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p class="small-text"><strong>Key observation:</strong> At $z^*$, we observe two different groups:</p>
+                    <ul class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        <li>Those just below (facing rate $t_0$)</li>
+                        <li>Those just above (facing rate $t_1$)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Consumption Discontinuity -->
+            <section>
+                <h2>Consumption Discontinuity at the Kink</h2>
+
+                <div style="margin-top: 30px;">
+                    <p>Let $\bar{x}_o(z)$ be the observed average consumption of $x$ at income $z$</p>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <p>At the kink point $z^*$, we observe:</p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center;">
+                            $$\lim_{z \to^- z^*} \bar{x}_o(z) = \bar{x}(z^*; t_0)$$
+                        </p>
+                        <p style="text-align: center; margin-top: 15px;">
+                            $$\lim_{z \to^+ z^*} \bar{x}_o(z) = \bar{x}(z^*; t_1)$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>The discontinuity:</strong></p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center;">
+                            $$\Delta \bar{x} = \lim_{z \to^+ z^*} \bar{x}_o(z) - \lim_{z \to^- z^*} \bar{x}_o(z)$$
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Why the Discontinuity Matters -->
+            <section>
+                <h2>Why This Discontinuity Matters</h2>
+
+                <div style="margin-top: 30px;">
+                    <p><strong>Naive interpretation (wrong!):</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        The jump reveals cross-price elasticity between $z$ and $x$
+                    </p>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>Problem:</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        Agent types are not continuous across the threshold
+                    </p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 10px;">
+                        Different people locate just below vs. just above $z^*$
+                    </p>
+                </div>
+
+                <div style="margin-top: 50px;">
+                    <p><strong>Key insight:</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        This <span class="heterogeneity">compositional change</span> actually reveals exactly what we need for tagging!
+                    </p>
+                </div>
+            </section>
+
+            <!-- Decomposing the Effect -->
+            <section>
+                <h2>Decomposing the Discontinuity</h2>
+
+                <div style="margin-top: 20px; font-size: 0.7em;">
+                    <p>The change in average consumption can be written as:</p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center;">
+                            $$\frac{\partial \bar{x}(z^*;t)}{\partial t} = \underbrace{\mathbb{E}\left[\frac{\partial x(z^*,\theta;t)}{\partial t} \mid z=z^*\right]}_{\text{Direct effect}} + \underbrace{\mathbb{C}\left[x(z^*,\theta;t), \frac{\partial \ln h(z^*|\theta;t)}{\partial t} \mid z=z^*\right]}_{\text{Composition effect}}$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;" class="small-text">
+                    <div class="revenue-box revenue-box-1">
+                        <p><strong>Direct effect:</strong> How individuals change their $x$ consumption in response to tax rate changes</p>
+                    </div>
+
+                    <div class="revenue-box revenue-box-2">
+                        <p><strong>Composition effect:</strong> How the types of people at $z^*$ change when the tax rate changes</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- The Heterogeneity Term -->
+            <section>
+                <h2>The <span class="heterogeneity">Heterogeneity</span> Term</h2>
+
+                <div style="margin-top: 30px;">
+                    <p>Define the heterogeneity-driven variation in consumption:</p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center;">
+                            $$x'_{het}(z^*,\theta;t) \equiv \left[\frac{\partial x}{\partial w} / \frac{\partial z}{\partial w}\right]_{w=w^{-1}(z^*)} \cdot [x(z^*,\theta;t) - \bar{x}(z^*;t)] \cdot \frac{h'(z^*|\theta;t)}{h(z^*|\theta;t)}$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;" class="small-text">
+                    <p>This captures the <span class="heterogeneity">non-causal</span> part of the relationship between $x$ and $z$:</p>
+                    <ul style="margin-left: 40px; margin-top: 15px;">
+                        <li>How $x$ varies with type, holding income constant</li>
+                        <li>Scaled by how types sort across income levels</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Main Identification Result -->
+            <section>
+                <h2><span class="identification">Main Result</span></h2>
+
+                <div style="margin-top: 30px; font-size: 0.75em;">
+                    <p>Under certain conditions (when $\beta = 0$), the consumption discontinuity identifies:</p>
+                    <div class="eq-highlight" style="border-color: var(--green-concept);">
+                        <p style="text-align: center; line-height: 1.6;">
+                            $$\frac{\lim_{z \to^+ z^*} \bar{x}_o(z) - \lim_{z \to^- z^*} \bar{x}_o(z)}{t_1 - t_0} = \frac{1}{t_1 - t_0} \int_{t_0}^{t_1} \frac{z^*}{1-t} \mathbb{E}[x'_{het}(z^*,\theta;t) \varepsilon^c(z^*,\theta;t) \mid z=z^*] dt$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>What does this mean?</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        The observable jump in consumption <span class="identification">directly identifies</span> a weighted average of the sufficient statistic for optimal tagging
+                    </p>
+                </div>
+            </section>
+
+            <!-- When Beta = 0 -->
+            <section>
+                <h2>When is $\beta = 0$?</h2>
+
+                <div style="margin-top: 40px;">
+                    <p>The bias term $\beta$ equals zero when:</p>
+                </div>
+
+                <div style="margin-top: 40px;" class="small-text">
+                    <div class="param-group">
+                        <h5 style="color: var(--blue-concept);">Condition 1: Constant ETI</h5>
+                        <p>The elasticity of taxable income $\varepsilon^c(z^*,\theta;t)$ is constant across $\theta$ (given $z$)</p>
+                    </div>
+
+                    <div class="param-group" style="margin-top: 20px;">
+                        <h5 style="color: var(--purple-concept);">Condition 2: Independence</h5>
+                        <p>The ETI is uncorrelated with consumption of $x$ conditional on $z$</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p class="small-text"><strong>Key point:</strong> These are much weaker conditions than needed to identify the ETI from bunching!</p>
+                </div>
+            </section>
+
+            <!-- Remarkable Result -->
+            <section>
+                <h2>A Remarkable Result</h2>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>Standard bunching literature:</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        Cannot identify ETI without strong assumptions about counterfactual income distribution
+                    </p>
+                </div>
+
+                <div style="margin-top: 50px;">
+                    <p><strong>This result:</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        <span class="identification">Point identifies</span> a policy-relevant sufficient statistic using only observable data
+                    </p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        No need to estimate counterfactual distributions
+                    </p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        Works even when ETI is not identified!
+                    </p>
+                </div>
+
+                <div class="result-box" style="margin-top: 50px;">
+                    <p style="text-align: center;">
+                        <strong>The "holy grail" of bunching identification — but for tagging parameters!</strong>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Interpretation -->
+            <section>
+                <h2>Economic Interpretation</h2>
+
+                <div style="margin-top: 30px;">
+                    <p><strong>What are we learning from the consumption jump?</strong></p>
+                </div>
+
+                <div style="margin-top: 40px;" class="small-text">
+                    <p>1. <strong>Preference heterogeneity:</strong></p>
+                    <p style="margin-left: 40px; margin-top: 10px;">
+                        Do people with similar incomes have systematically different tastes for $x$?
+                    </p>
+                </div>
+
+                <div style="margin-top: 30px;" class="small-text">
+                    <p>2. <strong>Sorting patterns:</strong></p>
+                    <p style="margin-left: 40px; margin-top: 10px;">
+                        How do these preference differences correlate with income choices?
+                    </p>
+                </div>
+
+                <div style="margin-top: 30px;" class="small-text">
+                    <p>3. <strong>Behavioral responses:</strong></p>
+                    <p style="margin-left: 40px; margin-top: 10px;">
+                        How sensitive are income choices to tax rate changes?
+                    </p>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p class="small-text" style="text-align: center;">
+                        <strong>All three ingredients → optimal commodity tax differentiation</strong>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Connection to Optimal Policy -->
+            <section>
+                <h2>Closing the Loop: Back to Optimal Policy</h2>
+
+                <div style="margin-top: 30px; font-size: 0.7em;">
+                    <p>Recall the optimal commodity tax formula required:</p>
+                    <div class="eq-highlight">
+                        <p style="text-align: center;">
+                            $$\mathbb{E}[x'_{inc}(z;\theta)\varepsilon_z(z;\theta)|z]$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; font-size: 0.7em;">
+                    <p>Our identification result gives us:</p>
+                    <div class="eq-highlight" style="border-color: var(--green-concept);">
+                        <p style="text-align: center;">
+                            $$\mathbb{E}[x'_{het}(z^*,\theta;t) \varepsilon^c(z^*,\theta;t) \mid z=z^*]$$
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <p class="small-text">Since $x'_{het}(z;\theta) = \bar{x}'(z) - x'_{inc}(z;\theta)$, these are closely related!</p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        With additional data on $\bar{x}'(z)$, we can back out the causal income effect
+                    </p>
+                </div>
+            </section>
+
+            <!-- Empirical Implementation -->
+            <section>
+                <h2>Empirical Implementation</h2>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>What you need:</strong></p>
+                    <ul class="small-text" style="margin-left: 40px; margin-top: 20px;">
+                        <li>Tax schedule with kinks (e.g., graduated income tax)</li>
+                        <li>Data on taxable income $z$</li>
+                        <li>Data on consumption of some good $x$ (e.g., from scanner data, administrative records)</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>What you do:</strong></p>
+                    <ul class="small-text" style="margin-left: 40px; margin-top: 20px;">
+                        <li>Estimate $\bar{x}_o(z)$ around tax bracket thresholds</li>
+                        <li>Measure the discontinuity at each kink</li>
+                        <li>Scale by the tax rate difference</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>What you get:</strong></p>
+                    <p class="small-text" style="margin-left: 40px; margin-top: 15px;">
+                        <span class="identification">Direct estimate</span> of whether commodity tax differentiation is warranted
+                    </p>
+                </div>
+            </section>
+
+            <!-- Extensions -->
+            <section>
+                <h2>Extensions and Future Work</h2>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>Current paper establishes:</strong></p>
+                    <ul class="small-text" style="margin-left: 40px; margin-top: 20px;">
+                        <li>Identification at tax kinks</li>
+                        <li>Linear commodity taxes</li>
+                        <li>Point identification of sufficient statistics</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 50px;">
+                    <p><strong>Natural extensions:</strong></p>
+                    <ul class="small-text" style="margin-left: 40px; margin-top: 20px;">
+                        <li>Nonlinear income tax schedules</li>
+                        <li>Tax notches (instead of kinks)</li>
+                        <li>Multiple commodities</li>
+                        <li>Estimation strategies for empirical application</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Conclusion -->
+            <section>
+                <h2>Conclusion</h2>
+
+                <div style="margin-top: 40px;">
+                    <p><strong>Key contributions:</strong></p>
+                    <ul style="margin-left: 40px; margin-top: 20px; line-height: 2;">
+                        <li>Formal framework linking <span class="bunching">bunching analysis</span> to <span class="tagging">optimal tagging</span></li>
+                        <li><span class="identification">Point identification</span> of policy-relevant sufficient statistics from consumption discontinuities</li>
+                        <li>Identification possible even when ETI cannot be identified from bunching alone</li>
+                        <li>Clear guidance for empirical implementation</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 60px; padding: 30px; background-color: rgba(46, 134, 171, 0.1); border-radius: 8px; border-left: 4px solid var(--blue-concept);">
+                    <p style="text-align: center; font-size: 1.1em;">
+                        <strong>Looking beyond bunching masses to consumption patterns<br>
+                        reveals the heterogeneity structure needed for optimal policy design</strong>
+                    </p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        // Initialize Reveal.js with 16:9 aspect ratio
+        Reveal.initialize({
+            hash: true,
+            transition: 'slide',
+            transitionSpeed: 'default',
+            center: false,
+            width: 1920,
+            height: 1080,
+            margin: 0.04,
+            minScale: 0.2,
+            maxScale: 2.0,
+            autoAnimate: true,
+            autoAnimateEasing: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
+            autoAnimateDuration: 0.8,
+            autoAnimateUnmatched: false
+        });
+
+        // Render math
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+        });
+
+        Reveal.on('slidechanged', () => {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+</body>
+</html>
