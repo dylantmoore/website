@@ -4257,7 +4257,7 @@ var PRESSES$1 = [
   {
     key: "spectral",
     stage: 4,
-    text: "One more route to $B$ is my spectral bunching estimator, which works with the frequencies of the data rather than its histogram. An extension to this chapter shows how it works. I will be presenting it at the NTA: “An Application of Euler's Formula to Bunching Methodology: Addressing Frictions via Spectral Deconvolution”, in the session “Frontiers in Measurement with Tax Microdata”, Friday, November 13, 8:30–10:00 am, Butler West (Floor 2, The Westin Pittsburgh)."
+    text: "One more route to $B$ is my spectral bunching estimator, which works with the frequencies of the data rather than its histogram. An extension to this chapter shows how it works."
   },
   {
     key: "survives",
@@ -5576,7 +5576,7 @@ var bodies$1 = [
     jsx(M$1, { tex: "p" }),
     "; the joint problem is not. The kink point’s weight also holds nearby smooth mass at finite grid spacing; CJMS separate the two by interpolating across that point. Their consistency result is for the CDF estimate. Aronsson, Jenderny and Lanot, “A maximum likelihood bunching estimator of the elasticity of taxable income”, ",
     jsx("em", { children: "Journal of Applied Econometrics" }),
-    " 39(1), 2024, pp. 200–216 (doi 10.1002/jae.3015), also estimate by maximum likelihood with a normal error. Their types are parametric: a truncated normal on either side of the kink. CJMS leave the types free, on the grid, which makes theirs a nonparametric maximum likelihood estimator (NPMLE). I will be presenting the spectral estimator at the NTA (the 119th Annual Conference on Taxation of the National Tax Association), Friday, November 13, 8:30–10:00 am, Butler West (Floor 2, The Westin Pittsburgh)."
+    " 39(1), 2024, pp. 200–216 (doi 10.1002/jae.3015), also estimate by maximum likelihood with a normal error. Their types are parametric: a truncated normal on either side of the kink. CJMS leave the types free, on the grid, which makes theirs a nonparametric maximum likelihood estimator (NPMLE)."
   ] }),
   jsxs(Fragment$1, { children: [
     "This recovers the latent ",
