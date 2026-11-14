@@ -5618,23 +5618,6 @@ var smoothstep = (u) => {
   const x = Math.max(0, Math.min(1, u));
   return x * x * (3 - 2 * x);
 };
-function hermiteWarp(knots) {
-  for (let k = 1; k < knots.length; k += 1) if (!(knots[k][0] > knots[k - 1][0]) || knots[k][1] < knots[k - 1][1]) throw new Error("Warp knots must increase");
-  return (time) => {
-    if (time <= knots[0][0]) return knots[0][1];
-    const last = knots[knots.length - 1];
-    if (time >= last[0]) return last[1];
-    let k = 0;
-    while (k < knots.length - 2 && knots[k + 1][0] <= time) k += 1;
-    const [t0, r0, m0] = knots[k];
-    const [t1, r1, m1] = knots[k + 1];
-    const h = t1 - t0;
-    const u = (time - t0) / h;
-    const u2 = u * u;
-    const u3 = u2 * u;
-    return (2 * u3 - 3 * u2 + 1) * r0 + (u3 - 2 * u2 + u) * h * m0 + (-2 * u3 + 3 * u2) * r1 + (u3 - u2) * h * m1;
-  };
-}
 var FILM_TOKENS = [
   "paper",
   "ink",
@@ -5889,21 +5872,6 @@ function decodeTracks(buffer, { mouthY = 430 } = {}) {
     words,
     landed
   };
-}
-function ballAt(tracks, i, seconds, out) {
-  const f = Math.min(tracks.frames, Math.max(0, seconds) * tracks.fps) - tracks.start[i];
-  if (f < 0) return false;
-  const n = tracks.length[i];
-  const a = Math.min(n - 1, Math.floor(f));
-  const b = Math.min(n - 1, a + 1);
-  const u = b === a ? 0 : f - Math.floor(f);
-  const base = tracks.offset[i];
-  out[0] = (tracks.words[base + 2 * a] * (1 - u) + tracks.words[base + 2 * b] * u) / 16;
-  out[1] = (tracks.words[base + 2 * a + 1] * (1 - u) + tracks.words[base + 2 * b + 1] * u) / 16;
-  return true;
-}
-function hasLanded(tracks, i, seconds) {
-  return seconds * tracks.fps >= tracks.landed[i];
 }
 function finalPosition(tracks, i) {
   const base = tracks.offset[i] + 2 * (tracks.length[i] - 1);
@@ -6647,69 +6615,67 @@ function titleSize(text) {
   return 3;
 }
 export {
-  regionColor as $,
-  hermiteWarp as A,
-  histogramBars as B,
-  ballAt as C,
-  hasLanded as D,
+  dentsIroningChapter as $,
+  FilmEntry as A,
+  createVisibility as B,
+  prefersReducedMotion as C,
+  FilmFigure as D,
   finalPosition as E,
-  derive as F,
-  fitStack as G,
-  createVisibility as H,
-  equation as I,
-  COLORS as J,
-  defineDerivation as K,
-  product as L,
-  FilmEntry as M,
-  markRouteEntry as N,
-  FilmFigure as O,
-  takeRouteEntry as P,
-  deriveModel as Q,
-  term as R,
-  prefersReducedMotion as S,
+  product as F,
+  isEmptyAt as G,
+  usePrefersReducedMotion as H,
+  term as I,
+  choiceFor as J,
+  COLORS as K,
+  createFigureScales as L,
+  takeRouteEntry as M,
+  derive as N,
+  createTimeline as O,
+  equation as P,
+  capsChapter as Q,
+  histogramBars as R,
+  drawTraces as S,
   fetchTrackBuffer as T,
-  Derivation as U,
-  mcPath as V,
-  usePrefersReducedMotion as W,
-  choiceFor as X,
-  DEFAULTS as Y,
-  clamp as Z,
+  fitStack as U,
+  Derivation as V,
+  defineDerivation as W,
+  deriveModel as X,
+  clamp as Y,
+  regionColor as Z,
   Link as _,
   SidebarTitle as a,
-  notchesFrictionlessChapter as at,
-  ballTrace as b,
+  taggingKinksChapter as at,
+  TRACE_STYLE as b,
   keyDirection as c,
-  taggingNotchesChapter as ct,
+  InlineMath as ct,
   DerivationBoard as d,
-  SvgMathLabel as dt,
-  capsChapter as et,
+  incomeEffectsChapter as et,
   derivationEnd as f,
   derivationStepFor as g,
   sequenceStart as h,
   titleText as i,
-  notchExtensionsChapter as it,
-  smoothstep as j,
-  createTimeline as k,
+  notchesFrictionsChapter as it,
+  markRouteEntry as j,
+  smoothstep as k,
   layoutFromQuery as l,
-  BlockMath as lt,
+  SvgMathLabel as lt,
   sequenceEnd as m,
   isRevisedSidebar as n,
-  incomeEffectsChapter as nt,
+  notchExtensionsChapter as nt,
   createPressMachine as o,
-  notchesFrictionsChapter as ot,
+  taggingNotchesChapter as ot,
   optionalSkipTarget as p,
-  isEmptyAt as q,
+  DEFAULTS as q,
   titleSize as r,
-  menusNotNoiseChapter as rt,
+  notchesFrictionlessChapter as rt,
   keyBelongsToTarget as s,
-  taggingKinksChapter as st,
+  BlockMath as st,
   eyebrowRepeatsTitle as t,
-  dentsIroningChapter as tt,
+  menusNotNoiseChapter as tt,
   useDevQuery as u,
-  InlineMath as ut,
   chainDerivations as v,
   decodeTracks as w,
-  drawTraces as x,
+  ballTrace as x,
   stackBalls as y,
-  createFigureScales as z
+  mcPath as z
 };

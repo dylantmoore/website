@@ -1,4 +1,4 @@
-import { $ as regionColor, A as hermiteWarp, B as histogramBars, C as ballAt, D as hasLanded, E as finalPosition, F as derive, H as createVisibility, I as equation, J as COLORS, L as product, O as FilmFigure, Q as deriveModel, R as term, S as prefersReducedMotion, T as fetchTrackBuffer, V as mcPath, W as usePrefersReducedMotion, X as choiceFor, Y as DEFAULTS, Z as clamp, b as ballTrace, dt as SvgMathLabel, j as smoothstep, k as createTimeline, ut as InlineMath, w as decodeTracks, x as drawTraces, y as stackBalls, z as createFigureScales } from "./core.js";
+import { B as createVisibility, C as prefersReducedMotion, D as FilmFigure, E as finalPosition, F as product, H as usePrefersReducedMotion, I as term, J as choiceFor, K as COLORS, L as createFigureScales, N as derive, O as createTimeline, P as equation, R as histogramBars, S as drawTraces, T as fetchTrackBuffer, X as deriveModel, Y as clamp, Z as regionColor, b as TRACE_STYLE, ct as InlineMath, k as smoothstep, lt as SvgMathLabel, q as DEFAULTS, w as decodeTracks, x as ballTrace, y as stackBalls, z as mcPath } from "./core.js";
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "https://cdn.jsdelivr.net/npm/react@19.2.6/+esm";
 import { Fragment as Fragment$1, jsx, jsxs } from "https://cdn.jsdelivr.net/npm/react@19.2.6/jsx-runtime/+esm";
 var CH1_RAIL_TYPES = {
@@ -240,13 +240,13 @@ var HISTOGRAM_SHARES = [
   0.15,
   0.12
 ];
-var clamp01$1 = (value) => Math.min(1, Math.max(0, value));
-var lerp$2 = (a, b, t) => a + (b - a) * t;
+var clamp01$2 = (value) => Math.min(1, Math.max(0, value));
+var lerp$3 = (a, b, t) => a + (b - a) * t;
 var easeInOut = (t) => {
-  const u = clamp01$1(t);
+  const u = clamp01$2(t);
   return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
 };
-var easeOut = (t) => 1 - Math.pow(1 - clamp01$1(t), 3);
+var easeOut = (t) => 1 - Math.pow(1 - clamp01$2(t), 3);
 function phase$1(time, a, b, ease = easeInOut) {
   if (time >= b) return 1;
   if (time <= a) return 0;
@@ -305,13 +305,13 @@ function sweepFrame$1(key, time, zOpt) {
     match: 0
   };
   if (key === "probeAbove") return {
-    z: lerp$2(below, above, phase$1(time, 0, SWEEP_SECONDS$1)),
+    z: lerp$3(below, above, phase$1(time, 0, SWEEP_SECONDS$1)),
     line: 1,
     regions: 1,
     match: 0
   };
   return {
-    z: lerp$2(above, zOpt, phase$1(time, 0, SWEEP_SECONDS$1 * 0.85)),
+    z: lerp$3(above, zOpt, phase$1(time, 0, SWEEP_SECONDS$1 * 0.85)),
     line: 1,
     regions: 1,
     match: phase$1(time, SWEEP_SECONDS$1 * 0.8, SWEEP_SECONDS$1)
@@ -399,7 +399,7 @@ function chevronRow({ zOpt, w, parameters, time, x: x2, invX, from = CHEVRON.fro
       z,
       dir: g > 0 ? 1 : -1,
       scale: 1,
-      opacity: clamp01$1(edgeDistance / spacing)
+      opacity: clamp01$2(edgeDistance / spacing)
     });
   };
   for (let cx = xs + shift; cx < xo - gap; cx += spacing) push(cx, cx - xs);
@@ -459,7 +459,7 @@ function familyFrame(key, time) {
     upper: 0
   }, focus = { ...all };
   let legacy = 0, boundaries = 0;
-  const dim = (from, to) => fade >= 1 ? to : fade <= 0 ? from : lerp$2(from, to, fade);
+  const dim = (from, to) => fade >= 1 ? to : fade <= 0 ? from : lerp$3(from, to, fade);
   if (key === "fanLower") {
     legacy = 1 - phase$1(time, 0, REBUILD_TIMING.legacy);
     fans.lower = phase$1(time, ...REBUILD_TIMING.firstFan);
@@ -1866,13 +1866,13 @@ function MarginalCostFigure({ step, entering, parameters, displayW, helpers, fam
   const ratePanelIn = stage === 2 ? at("taxSlopeLeft", 0, 0.45) : 1;
   const taxGhost = stage >= 3 ? 1 : 0;
   const taxMax = 125;
-  const taxBottom = lerp$2(baseline, TAX_PANEL_BOTTOM, compress);
+  const taxBottom = lerp$3(baseline, TAX_PANEL_BOTTOM, compress);
   const taxY = (tax) => top + (1 - tax / taxMax) * (taxBottom - top);
   const taxAtKink = taxLiability(zStar, parameters);
   const taxAtMax = taxLiability(xMax, parameters);
   const taxLowerPath = `M${x2(0)},${taxY(0)} L${thresholdX},${taxY(taxAtKink)}`;
   const taxUpperPath = `M${thresholdX},${taxY(taxAtKink)} L${x2(xMax)},${taxY(taxAtMax)}`;
-  const rateTop = lerp$2(RATE_PANEL_TOP, top, stage === 2 ? 0 : stage === 3 ? 1 : 1);
+  const rateTop = lerp$3(RATE_PANEL_TOP, top, stage === 2 ? 0 : stage === 3 ? 1 : 1);
   const yR = (value) => baseline - value / yMax * (baseline - rateTop);
   const tangents = [];
   let lowerTrace = null;
@@ -1880,7 +1880,7 @@ function MarginalCostFigure({ step, entering, parameters, displayW, helpers, fam
   let lowerEndAlpha = 0;
   let upperEndAlpha = 0;
   if (stepKey === "taxSlopeLeft") {
-    const z = lerp$2(TANGENT_Z.start, zStar, phase$1(time, 0.62, 1.3));
+    const z = lerp$3(TANGENT_Z.start, zStar, phase$1(time, 0.62, 1.3));
     tangents.push({
       z,
       slope: t02,
@@ -1904,8 +1904,8 @@ function MarginalCostFigure({ step, entering, parameters, displayW, helpers, fam
   }
   const flipLower = stage < 3 ? 0 : 1;
   const flipUpper = stage < 3 ? 0 : at("mbDrop", 0.35, 0.95);
-  const lowValue = lerp$2(t02, 1 - t02, flipLower);
-  const upValue = lerp$2(t12, 1 - t12, flipUpper);
+  const lowValue = lerp$3(t02, 1 - t02, flipLower);
+  const upValue = lerp$3(t12, 1 - t12, flipUpper);
   const upperMuted = stage !== 3 ? 1 : at("mbDrop", 0, 0.35);
   const mbLowerY = yR(lowValue);
   const mbUpperY = yR(upValue);
@@ -1914,7 +1914,7 @@ function MarginalCostFigure({ step, entering, parameters, displayW, helpers, fam
   const dollarFlip = 1;
   const copySlide = at("mbDrop", 0, 0.55);
   const copyMix = at("mbDrop", 0.35, 0.95);
-  const copyShare = lerp$2(t02, t12, copyMix);
+  const copyShare = lerp$3(t02, t12, copyMix);
   const keptHold = at("mbDollar", 0, 0.6);
   const probeStep = stepKey in PROBE_ROLE ? stepKey : null;
   const exitingProbe = Object.keys(PROBE_EXIT).find((key) => arriving(PROBE_EXIT[key])) ?? null;
@@ -2019,8 +2019,8 @@ function MarginalCostFigure({ step, entering, parameters, displayW, helpers, fam
     const { center, taxShare, flip, role, alpha, taxAlpha, labels } = options;
     const barWidth = 30;
     const kept = 1 - taxShare;
-    const taxLow = lerp$2(0, kept, flip);
-    const keptLow = lerp$2(taxShare, 0, flip);
+    const taxLow = lerp$3(0, kept, flip);
+    const keptLow = lerp$3(taxShare, 0, flip);
     const arc = Math.sin(Math.PI * flip) * 40;
     const mix2 = options.mix ?? (role === "lower" ? 0 : 1);
     const blend = (a, b) => mix2 <= 0 ? a : mix2 >= 1 ? b : `color-mix(in srgb, ${b} ${(mix2 * 100).toFixed(1)}%, ${a})`;
@@ -2336,18 +2336,18 @@ function MarginalCostFigure({ step, entering, parameters, displayW, helpers, fam
                 flip: dollarFlip,
                 role: "lower",
                 alpha: stage === 3 ? dollarIn : 1,
-                taxAlpha: lerp$2(1, 0.4, keptHold),
+                taxAlpha: lerp$3(1, 0.4, keptHold),
                 labels: stage === 3 ? 1 : 1,
                 side: "left"
               }), (on("mbDrop") || arriving("utility")) && dollarBar({
                 key: "copy",
-                center: lerp$2(x2(DOLLAR_BAR_Z.lower), x2(DOLLAR_BAR_Z.upper), copySlide),
+                center: lerp$3(x2(DOLLAR_BAR_Z.lower), x2(DOLLAR_BAR_Z.upper), copySlide),
                 taxShare: copyShare,
                 flip: 1,
                 role: "upper",
                 mix: copyMix,
                 alpha: 1,
-                taxAlpha: lerp$2(1, 0.4, keptHold),
+                taxAlpha: lerp$3(1, 0.4, keptHold),
                 labels: stage === 3 ? at("mbDrop", 0.95, 1.25) : 1,
                 side: "right"
               })]
@@ -2707,7 +2707,7 @@ function MarginalCostFigure({ step, entering, parameters, displayW, helpers, fam
     const mc = marginalCost(frame.z, w, parameters.e);
     const gain = region.kind === "gain";
     const labelY = gain ? y2((mb + Math.max(mc, 0)) / 2) : y2(Math.min(yMax, (mb + Math.min(mc, yMax)) / 2));
-    const regionAlpha = frame.regions * clamp01$1(Math.abs(px - x2(choice2.z)) / 10);
+    const regionAlpha = frame.regions * clamp01$2(Math.abs(px - x2(choice2.z)) / 10);
     return jsxs("g", {
       className: "kf-sweep",
       "data-sweep": key,
@@ -2788,11 +2788,11 @@ function MarginalCostFigure({ step, entering, parameters, displayW, helpers, fam
       x: x2,
       invX
     });
-    const fadeIn = Number.isFinite(probe.time) ? clamp01$1(probe.time / CHEVRON.fadeIn) : 1;
+    const fadeIn = Number.isFinite(probe.time) ? clamp01$2(probe.time / CHEVRON.fadeIn) : 1;
     const gain = settled ? "" : gainAreaPath(z, choice2.z, w, parameters, x2, y2);
     const labelX = role === "lower" ? x2(choice2.z) - 16 : x2(choice2.z) + (role === "upper" ? 16 : -28);
     const zLabelOutside = isCorner && z > parameters.zStar;
-    const zLabelAlpha = isCorner ? clamp01$1((Math.abs(px - thresholdX) - 36) / 14) : 1;
+    const zLabelAlpha = isCorner ? clamp01$2((Math.abs(px - thresholdX) - 36) / 14) : 1;
     return jsxs("g", {
       className: `kf-probe kf-probe-${role}${exiting ? " kf-exit" : ""}`,
       "data-probe": probe.key,
@@ -14928,10 +14928,6 @@ var EXEMPLARS = [
 var BIN_ORIGIN = -2.5;
 var KINK_BIN = Math.floor((RATES.zStar - BIN_ORIGIN) / 5);
 var INTERVAL = 3;
-var INTRO = 10;
-var RAMP = 10;
-var MAX = 90;
-var RAMP_AREA = RAMP * (1 + MAX) / 2;
 function choice(w, e2) {
   const lo = w * (1 - RATES.t0) ** e2;
   const hi = w * (1 - RATES.t1) ** e2;
@@ -14968,36 +14964,6 @@ function population(e2, count = COUNT) {
   });
   populations.set(key, people);
   return people;
-}
-function timing(count = COUNT) {
-  const last = 0.6 + (count - 1) * INTERVAL + 3;
-  const cruise = (last - INTRO - 2 * RAMP_AREA) / MAX;
-  const finish = INTRO + 2 * RAMP + cruise;
-  return {
-    last,
-    cruise,
-    finish,
-    duration: finish + 5
-  };
-}
-function storyTime(t, count = COUNT) {
-  const cruise = timing(count).cruise;
-  let s = Math.max(0, t);
-  if (s <= INTRO) return s;
-  s -= INTRO;
-  const ramp = (x2) => (MAX - 1) * (x2 / 2 - RAMP * Math.sin(Math.PI * x2 / RAMP) / (2 * Math.PI));
-  if (s < RAMP) return INTRO + s + ramp(s);
-  s -= RAMP;
-  if (s < cruise) return INTRO + RAMP_AREA + MAX * s;
-  s = Math.min(RAMP, s - cruise);
-  return INTRO + RAMP_AREA + MAX * cruise + MAX * s - ramp(s);
-}
-function activePerson(t, count = COUNT) {
-  const index = Math.floor((storyTime(t, count) - 0.6) / INTERVAL);
-  return index >= 0 && index < count ? index : -1;
-}
-function chosenCount(t, count = COUNT) {
-  return Math.min(count, Math.max(0, 1 + Math.floor((storyTime(t, count) - 0.6) / INTERVAL)));
 }
 function kinkBinInterior(e2) {
   const interior = population(e2).filter((person) => person.bin === KINK_BIN && person.region !== "buncher");
@@ -15080,11 +15046,89 @@ function packPeople(people) {
   if (recorded) recordedPiles.set(recorded, pile);
   return pile;
 }
-function landingBlend(time, release, landing) {
-  const duration = Math.min(0.65, Math.max(0, (landing - release) * 0.6));
-  if (duration === 0) return time >= landing ? 1 : 0;
-  const u = Math.max(0, Math.min(1, (time - landing + duration) / duration));
-  return u * u * (3 - 2 * u);
+var clamp01$1 = (u) => u <= 0 ? 0 : u >= 1 ? 1 : u;
+var lerp$2 = (a, b, u) => a + (b - a) * u;
+var GRAVITY = 1e3;
+var SHRINK = 0.12;
+var ROLL = {
+  speed: 95,
+  min: 0.06,
+  max: 0.35
+};
+var EXEMPLAR_PACE = {
+  first: 0.35,
+  grow: 0.55,
+  dot: 0.6,
+  release: 1.15,
+  after: 0.45
+};
+var STREAM_PACE = {
+  gap0: 0.85,
+  q: 0.85
+};
+function accelTimes(n, t02, tEnd, gap0, q) {
+  const span = tEnd - t02;
+  const total2 = (gMin) => {
+    let s = 0, g2 = gap0;
+    for (let k2 = 0; k2 < n - 1; k2 += 1) {
+      s += Math.max(gMin, g2);
+      g2 *= q;
+    }
+    return s;
+  };
+  if (total2(0) > span) throw new Error(`accelTimes: ${n} people cannot fit in ${span.toFixed(2)} s`);
+  let lo = 0, hi = gap0;
+  for (let it = 0; it < 60; it += 1) {
+    const mid = (lo + hi) / 2;
+    if (total2(mid) < span) lo = mid;
+    else hi = mid;
+  }
+  const out = new Float64Array(n);
+  let t = t02, g = gap0;
+  for (let k2 = 0; k2 < n; k2 += 1) {
+    out[k2] = t;
+    t += Math.max(lo, g);
+    g *= q;
+  }
+  return out;
+}
+function flashPlan(times, lead = 0.45) {
+  const n = times.length;
+  return Array.from(times, (a, i) => {
+    const gap = i < n - 1 ? times[i + 1] - a : 1;
+    const slow = clamp01$1((gap - 0.12) / 0.6);
+    return {
+      a,
+      grow: 0.3 * slow,
+      dot: a + 0.25 * slow,
+      dotIn: lerp$2(0.04, 0.15, slow),
+      rel: a + lerp$2(0.08, lead, slow),
+      end: a + (gap >= 0.85 ? lead + 0.4 : gap + 0.15 * slow),
+      fade: 0.25 * slow,
+      width: lerp$2(1.6, 2.2, slow)
+    };
+  });
+}
+function fallOf(rel, distance, roll) {
+  const hit = rel + Math.sqrt(2 * Math.max(0, distance) / GRAVITY);
+  return {
+    rel,
+    hit,
+    rest: hit + Math.max(ROLL.min, Math.min(ROLL.max, roll / ROLL.speed)),
+    distance
+  };
+}
+function descent(f, s) {
+  if (s <= 0) return 0;
+  const span = f.hit - f.rel;
+  return span > 0 ? clamp01$1(s * s / (span * span)) : 1;
+}
+function rollAt(f, t) {
+  return 1 - (1 - clamp01$1((t - f.hit) / Math.max(1e-6, f.rest - f.hit))) ** 3;
+}
+function flashAlpha(f, t) {
+  if (t < f.a || t >= f.end) return 0;
+  return f.fade > 0 ? clamp01$1((f.end - t) / f.fade) : 1;
 }
 var CASE_E = {
   low: 0.2,
@@ -15098,18 +15142,27 @@ var ROUTE = {
   comparison: COMPARISON
 };
 var FAN_SECONDS = 1.5;
-var PRIMARY_RUN = 8;
+var EXEMPLAR_SECONDS = 8.4;
+var EVERYONE_SECONDS = 11.5;
+var STREAM_START = 0.45;
+var STREAM_SPAN = 9.4;
 var REPLAY_RUN = 7;
+var REPLAY_PACE = {
+  start: 0.15,
+  span: 5.2,
+  gap0: 0.55,
+  q: 0.72
+};
 var PANEL_MOVE_SECONDS = 0.8;
 var PANEL_REVEAL_SECONDS = 0.2;
 var SEGMENTS = [
   {
     key: "exemplars",
-    duration: 9.55
+    duration: EXEMPLAR_SECONDS
   },
   {
     key: "everyone",
-    duration: PRIMARY_RUN
+    duration: EVERYONE_SECONDS
   },
   {
     key: "settled",
@@ -15150,62 +15203,12 @@ var progress = (t, key) => {
 };
 var clamp01 = (x2) => Math.max(0, Math.min(1, x2));
 var lerp$1 = (a, b, u) => a + (b - a) * u;
-var EXEMPLAR_ENDS = [
-  3.55,
-  6.55,
-  9.55
-];
-var RECORDING_END = timing().duration;
-var primaryEveryone = hermiteWarp([
-  [
-    0,
-    EXEMPLAR_ENDS[2],
-    24
-  ],
-  [
-    0.5,
-    20,
-    10
-  ],
-  [
-    7.4,
-    84.1,
-    7
-  ],
-  [
-    PRIMARY_RUN,
-    86.75,
-    0
-  ]
-]);
-var replayAll = hermiteWarp([
-  [
-    0,
-    0,
-    90
-  ],
-  [
-    0.25,
-    20,
-    10
-  ],
-  [
-    6.5,
-    84,
-    10
-  ],
-  [
-    REPLAY_RUN,
-    RECORDING_END,
-    15
-  ]
-]);
+var ramp = (t, a, b) => b <= a ? t >= b ? 1 : 0 : clamp01((t - a) / (b - a));
 function sceneAt$1(t) {
-  const everyone = segment("everyone");
   const again = segment("again");
-  const rPrimary = t <= everyone.start ? Math.max(0, t) : t >= everyone.end ? RECORDING_END : primaryEveryone(t - everyone.start);
+  const rPrimary = Math.max(0, t);
   const replayStart = again.start + PANEL_MOVE_SECONDS + PANEL_REVEAL_SECONDS;
-  const rComparison = t <= replayStart ? 0 : replayAll(t - replayStart);
+  const rComparison = Math.max(0, t - replayStart);
   const move = smoothstep((t - again.start) / PANEL_MOVE_SECONDS);
   const run = (r2) => ({
     r: r2,
@@ -15229,19 +15232,6 @@ function familyAt(t) {
     e: lerp$1(CASE_E.high, CASE_E.larger, smoothstep(progress(t, "pivot"))),
     alpha: smoothstep(progress(t, "family")),
     visible: t >= segment("pivot").start
-  };
-}
-function flightOf(tracks, people) {
-  const startY = new Float64Array(tracks.count);
-  const landY = new Float64Array(tracks.count);
-  for (let i = 0; i < tracks.count; i += 1) {
-    startY[i] = 385 - people[i].mc * 205;
-    const frame = Math.max(0, Math.min(tracks.length[i] - 1, tracks.landed[i] - tracks.start[i]));
-    landY[i] = tracks.words[tracks.offset[i] + 2 * frame + 1] / 16;
-  }
-  return {
-    startY,
-    landY
   };
 }
 var binOf = (filmX) => Math.max(0, Math.min(48, Math.floor(((filmX - 120) / 4 - BIN_ORIGIN) / 5)));
@@ -15326,47 +15316,46 @@ function footprintLayout(people) {
     widest: filled
   };
 }
-function caseAssets(tracks, people, e2) {
+function caseAssets(tracks, people, e2, role) {
+  const packing = packPeople(people);
   return {
     tracks,
     people,
     e: e2,
-    flight: flightOf(tracks, people),
-    packing: packPeople(people),
+    run: role ? dropRun(people, packing, e2, role) : null,
+    packing,
     sort: sortPlan(tracks, people, e2),
     final: finalOutline(tracks),
     footprints: footprintLayout(people)
   };
 }
-function panelState(tracks, people, r2, sort = 0, plan = null) {
-  const n = tracks.count;
+function panelState(data, r2) {
+  const n = data.people.length;
+  const run = data.run;
   const x2 = new Float64Array(n).fill(NaN);
   const y2 = new Float64Array(n).fill(NaN);
   const landed = new Uint8Array(n);
   const tops = new Float64Array(49).fill(Number.POSITIVE_INFINITY);
   const counts = new Uint16Array(49);
-  const point = new Float64Array(2);
   let released = 0;
   let landedCount = 0;
   let landedBunchers = 0;
+  let chosen = 0;
   for (let i = 0; i < n; i += 1) {
-    if (!ballAt(tracks, i, r2, point)) continue;
+    if (!run) continue;
+    if (r2 >= run.flash[i].dot) chosen += 1;
+    if (r2 < run.fall[i].rel) continue;
     released += 1;
-    x2[i] = point[0];
-    y2[i] = point[1];
-    if (!hasLanded(tracks, i, r2)) continue;
+    const slot = data.packing.slots[i];
+    x2[i] = slot.x;
+    y2[i] = slot.y;
+    if (r2 < run.fall[i].rest) continue;
     landed[i] = 1;
     landedCount += 1;
-    if (people[i].region === "buncher") landedBunchers += 1;
-    const bin = binOf(point[0]);
-    counts[bin] += 1;
-    if (point[1] < tops[bin]) tops[bin] = point[1];
+    if (data.people[i].region === "buncher") landedBunchers += 1;
+    counts[slot.bin] += 1;
+    if (slot.y < tops[slot.bin]) tops[slot.bin] = slot.y;
   }
-  const applied = plan && sort > 0 && r2 >= RECORDING_END && landedCount === n ? sort : 0;
-  if (applied > 0 && plan) plan.members.forEach((i, k2) => {
-    x2[i] = lerp$1(plan.fromX[k2], plan.toX[k2], applied);
-    y2[i] = lerp$1(plan.fromY[k2], plan.toY[k2], applied);
-  });
   return {
     r: r2,
     x: x2,
@@ -15375,16 +15364,16 @@ function panelState(tracks, people, r2, sort = 0, plan = null) {
     released,
     landedCount,
     landedBunchers,
-    chosen: chosenCount(r2, n),
+    chosen,
     tops,
     counts,
-    active: activePerson(r2, n),
-    sort: applied
+    active: run ? activeFlash(run, r2) : -1,
+    sort: 0
   };
 }
 function runState(assets, role, run) {
   const data = assets.cases[ROUTE[role]];
-  return data ? panelState(data.tracks, data.people, run.r, run.sort, data.sort) : null;
+  return data ? panelState(data, run.r) : null;
 }
 var memo = null;
 function filmState(t, assets) {
@@ -15419,9 +15408,9 @@ function assetsFromBuffers(low, high, larger) {
     high: highTracks,
     people,
     cases: {
-      ...larger ? { larger: caseAssets(decodeTracks(larger), population(CASE_E.larger), CASE_E.larger) } : {},
-      low: caseAssets(lowTracks, people.low, CASE_E.low),
-      high: caseAssets(highTracks, people.high, CASE_E.high)
+      ...larger ? { larger: caseAssets(decodeTracks(larger), population(CASE_E.larger), CASE_E.larger, "comparison") } : {},
+      low: caseAssets(lowTracks, people.low, CASE_E.low, null),
+      high: caseAssets(highTracks, people.high, CASE_E.high, "primary")
     }
   };
 }
@@ -15548,57 +15537,181 @@ function panelMaps(move, height = VIEWBOX$1.height) {
 var MB_LOW = 1 - RATES.t0;
 var MB_HIGH = 1 - RATES.t1;
 var MB_TOP = 1.03;
-function displayBall(map, data, state, i) {
-  return displayAt(map, data, i, state.r, state.x[i], state.y[i]);
-}
-function displayAt(map, data, i, r2, rx, ry) {
-  const slot = data.packing.slots[i];
-  const targetX = map.X(slot.x), targetY = map.Y(slot.y);
-  const blend = landingBlend(r2, data.tracks.start[i] / data.tracks.fps, data.tracks.landed[i] / data.tracks.fps);
-  if (blend >= 1) return {
-    x: targetX,
-    y: targetY,
-    blend: 1,
-    shrink: 1,
-    radius: map.radius
-  };
-  const start = data.flight.startY[i], end = data.flight.landY[i];
-  const descent = end > start ? clamp01((ry - start) / (end - start)) : 0;
-  const recordedY = lerp$1(map.MY(data.people[i].mc), targetY, descent);
-  const shrink = smoothstep((blend - 0.6) / 0.4);
+var BIN_GAP = 5e-4;
+var dropMap = (role) => role === "primary" ? panelMaps(0).primary : panelMaps(1).comparison;
+function fallGeometry(map, person, slot) {
+  const dotX = map.XZ(person.z), dotY = map.MY(person.mc);
+  const toX = map.X(slot.x), toY = map.Y(slot.y);
+  const left = map.X(120 + 4 * binLeft(slot.bin)) + map.radius, right = map.X(120 + 4 * binLeft(slot.bin + 1)) - map.radius;
+  const fx = Math.max(left, Math.min(right, dotX));
+  const lift = Math.min(1.6 * map.radius, 0.5 * Math.abs(toX - fx));
   return {
-    x: lerp$1(map.X(rx), targetX, blend),
-    y: lerp$1(recordedY, targetY, blend),
-    blend,
-    shrink,
-    radius: lerp$1(flightRadius(map), map.radius, shrink)
+    dotX,
+    dotY,
+    fx,
+    hitY: toY - lift,
+    toX,
+    toY,
+    roll: Math.hypot(toX - fx, lift)
   };
+}
+var runs = new Map();
+function dropRun(people, packing, e2, role) {
+  const key = `${e2}:${role}`;
+  const cached = runs.get(key);
+  if (cached) return cached;
+  const map = dropMap(role);
+  const n = people.length;
+  const geo = (i) => fallGeometry(map, people[i], packing.slots[i]);
+  const flash = new Array(n);
+  if (role === "primary") {
+    let a = EXEMPLAR_PACE.first;
+    for (let k2 = 0; k2 < 3; k2 += 1) {
+      const g = geo(k2), rel = a + EXEMPLAR_PACE.release;
+      const f = fallOf(rel, g.hitY - g.dotY, g.roll);
+      flash[k2] = {
+        a,
+        grow: EXEMPLAR_PACE.grow,
+        dot: a + EXEMPLAR_PACE.dot,
+        dotIn: 0.2,
+        rel,
+        end: f.hit + 0.3,
+        fade: 0.45,
+        width: 2.4
+      };
+      a = f.hit + EXEMPLAR_PACE.after;
+    }
+    const t02 = EXEMPLAR_SECONDS + STREAM_START;
+    flashPlan(accelTimes(n - 3, t02, t02 + STREAM_SPAN, STREAM_PACE.gap0, STREAM_PACE.q)).forEach((f, j) => {
+      flash[j + 3] = f;
+    });
+  } else {
+    const p = REPLAY_PACE;
+    flashPlan(accelTimes(n, p.start, p.start + p.span, p.gap0, p.q)).forEach((f, i) => {
+      flash[i] = f;
+    });
+  }
+  const fall = flash.map((f, i) => {
+    const g = geo(i);
+    return fallOf(f.rel, g.hitY - g.dotY, g.roll);
+  });
+  const order = ARRIVALS[e2.toFixed(1)]?.order ?? people.map((_, i) => i);
+  const last = new Map();
+  for (const i of order) {
+    const bin = people[i].bin;
+    const d = (last.get(bin) ?? Number.NEGATIVE_INFINITY) + BIN_GAP - fall[i].hit;
+    if (d > 0) {
+      const f = flash[i];
+      flash[i] = {
+        ...f,
+        a: f.a + d,
+        dot: f.dot + d,
+        rel: f.rel + d,
+        end: f.end + d
+      };
+      fall[i] = {
+        ...fall[i],
+        rel: fall[i].rel + d,
+        hit: fall[i].hit + d,
+        rest: fall[i].rest + d
+      };
+    }
+    last.set(bin, fall[i].hit);
+  }
+  const run = {
+    flash,
+    fall,
+    mark: Uint8Array.from(flash, (f, i) => i < 3 || f.grow > 0.15 ? 1 : 0),
+    end: fall.reduce((m, f) => Math.max(m, f.rest), 0),
+    primary: role === "primary"
+  };
+  runs.set(key, run);
+  return run;
+}
+var primaryRun = () => dropRun(population(CASE_E[PRIMARY]), packPeople(population(CASE_E[PRIMARY])), CASE_E[PRIMARY], "primary");
+function activeFlash(run, r2) {
+  let who = -1;
+  for (let i = 0; i < run.flash.length; i += 1) {
+    const f = run.flash[i];
+    if (f.a > r2) continue;
+    if (r2 < f.end) who = i;
+  }
+  return who;
 }
 var FLIGHT = {
   scale: 2.5,
-  min: 3
+  min: 3,
+  exemplar: 5
 };
 var flightRadius = (map) => Math.max(FLIGHT.min, map.radius * FLIGHT.scale);
+function displayBall(map, data, state, i) {
+  return displayAt(map, data, i, state.r);
+}
+function displayAt(map, data, i, r2) {
+  const slot = data.packing.slots[i];
+  const run = data.run;
+  const toX = map.X(slot.x), toY = map.Y(slot.y);
+  if (!run || r2 >= run.fall[i].rest) return {
+    x: toX,
+    y: toY,
+    blend: 1,
+    shrink: 1,
+    radius: map.radius,
+    waiting: false
+  };
+  const f = run.fall[i];
+  const g = fallGeometry(map, data.people[i], slot);
+  const big = i < 3 && run.primary ? Math.max(FLIGHT.exemplar, flightRadius(map)) : flightRadius(map);
+  if (r2 < f.rel) return {
+    x: g.dotX,
+    y: g.dotY,
+    blend: 0,
+    shrink: 0,
+    radius: big,
+    waiting: true
+  };
+  if (r2 < f.hit) {
+    const u = descent(f, r2 - f.rel);
+    const shrink = smoothstep((r2 - (f.hit - SHRINK)) / SHRINK);
+    return {
+      x: lerp$1(g.dotX, g.fx, Math.min(1, u * 4)),
+      y: lerp$1(g.dotY, g.hitY, u),
+      blend: 0,
+      shrink,
+      radius: lerp$1(big, map.radius, shrink),
+      waiting: false
+    };
+  }
+  const v = rollAt(f, r2);
+  return {
+    x: lerp$1(g.fx, g.toX, v),
+    y: lerp$1(g.hitY, g.toY, v),
+    blend: v,
+    shrink: 1,
+    radius: map.radius,
+    waiting: false
+  };
+}
 var TRACE = {
   lag: 0.06,
   samples: 4,
-  capRadii: 13.6
+  capRadii: 9.2
 };
 function panelTraces(map, data, state, t, runAt, reduced = false) {
   const out = [];
-  if (reduced) return out;
-  const recordAt = new Map();
-  const point = new Float64Array(2);
+  if (reduced || !data.run) return out;
+  const run = data.run;
+  const lagR = new Map();
   for (let i = 0; i < data.people.length; i += 1) {
-    if (Number.isNaN(state.x[i])) continue;
-    const now = displayAt(map, data, i, state.r, state.x[i], state.y[i]);
-    if (now.blend >= 1) continue;
+    const f = run.fall[i];
+    if (state.r < f.rel || state.r >= f.hit) continue;
+    const now = displayAt(map, data, i, state.r);
     const at = (time) => {
       if (time === t) return [now.x, now.y];
-      let r2 = recordAt.get(time);
-      if (r2 === void 0) recordAt.set(time, r2 = runAt(time));
-      if (!ballAt(data.tracks, i, r2, point)) return null;
-      const p = displayAt(map, data, i, r2, point[0], point[1]);
+      let r2 = lagR.get(time);
+      if (r2 === void 0) lagR.set(time, r2 = runAt(time));
+      if (r2 < f.rel) return null;
+      const p = displayAt(map, data, i, r2);
       return [p.x, p.y];
     };
     const path = ballTrace(at, t, {
@@ -15676,15 +15789,17 @@ function drawFrame(ctx, map, theme) {
   ctx.lineWidth = 1.2;
   strokeLine(ctx, z0, base, z1, base);
 }
-function mcCurve(ctx, map, w, e2) {
+function mcCurve(ctx, map, w, e2, grow = 1) {
   const { XZ, MY } = map;
   ctx.save();
   ctx.beginPath();
   ctx.rect(XZ(Z_DOMAIN[0]), MY(MB_TOP), XZ(map.zHi) - XZ(Z_DOMAIN[0]), MY(0) - MY(MB_TOP));
   ctx.clip();
   ctx.beginPath();
+  const zEnd = Math.min(map.zHi, w * (MB_TOP + 0.02) ** e2);
+  const zTo = grow >= 1 ? map.zHi : Z_DOMAIN[0] + (zEnd - Z_DOMAIN[0]) * Math.max(0, grow);
   for (let k2 = 0; k2 <= 120; k2 += 1) {
-    const z = Z_DOMAIN[0] + (map.zHi - Z_DOMAIN[0]) * k2 / 120;
+    const z = Z_DOMAIN[0] + (zTo - Z_DOMAIN[0]) * k2 / 120;
     const mc = Math.min(MB_TOP + 0.2, (z / w) ** (1 / e2));
     if (k2) ctx.lineTo(XZ(z), MY(mc));
     else ctx.moveTo(XZ(z), MY(mc));
@@ -15710,22 +15825,83 @@ function choiceMark(ctx, x2, y2, region, theme) {
   ctx.arc(x2, y2, 4.2, 0, Math.PI * 2);
   ctx.fill();
 }
-function drawActive(ctx, map, person, e2, theme) {
-  ctx.strokeStyle = theme[person.region];
-  ctx.lineWidth = 2;
-  mcCurve(ctx, map, person.w, e2);
-  choiceMark(ctx, map.XZ(person.z), map.MY(person.mc), person.region, theme);
-}
-function drawExemplarRings(ctx, map, state, data, theme) {
-  for (let i = 0; i < 3; i += 1) {
-    if (!state.landed[i]) continue;
-    ctx.beginPath();
+function drawFlashes(ctx, map, data, r2, theme) {
+  const run = data.run;
+  if (!run) return;
+  const base = ctx.globalAlpha;
+  ctx.save();
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  for (let i = 0; i < run.flash.length; i += 1) {
+    const f = run.flash[i];
+    if (f.a > r2 + 2) continue;
+    const alpha = flashAlpha(f, r2);
+    if (alpha <= 0) continue;
+    const u = f.grow > 0 ? 1 - (1 - clamp01((r2 - f.a) / f.grow)) ** 3 : 1;
+    ctx.globalAlpha = base * 0.92 * alpha;
     ctx.strokeStyle = theme[data.people[i].region];
-    ctx.lineWidth = 1.4;
-    const p = displayBall(map, data, state, i);
-    ctx.arc(p.x, p.y, Math.max(6, map.radius * 3), 0, Math.PI * 2);
-    ctx.stroke();
+    ctx.lineWidth = f.width;
+    mcCurve(ctx, map, data.people[i].w, data.e, u);
   }
+  ctx.restore();
+}
+function drawChoices(ctx, map, data, r2, theme) {
+  const run = data.run;
+  if (!run) return;
+  const base = ctx.globalAlpha;
+  ctx.save();
+  for (let i = 0; i < run.flash.length; i += 1) {
+    const f = run.flash[i];
+    if (r2 < f.dot || r2 >= run.fall[i].rel) continue;
+    const alpha = clamp01((r2 - f.dot) / Math.max(1e-6, f.dotIn));
+    const p = data.people[i];
+    ctx.globalAlpha = base * alpha;
+    if (run.mark[i]) {
+      choiceMark(ctx, map.XZ(p.z), map.MY(p.mc), p.region, theme);
+      continue;
+    }
+    const radius = flightRadius(map);
+    ctx.fillStyle = theme[p.region];
+    ctx.globalAlpha = base * alpha * TRACE_STYLE.haloAlpha;
+    ctx.beginPath();
+    ctx.arc(map.XZ(p.z), map.MY(p.mc), radius * TRACE_STYLE.halo, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = base * alpha;
+    ctx.beginPath();
+    ctx.arc(map.XZ(p.z), map.MY(p.mc), radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+function drawExemplarRings(ctx, map, data, r2, t, theme) {
+  const run = data.run;
+  if (!run || !run.primary) return;
+  const out = 1 - ramp(t, segment("everyone").start + 0.2, segment("everyone").start + 1.2);
+  const base = ctx.globalAlpha;
+  ctx.save();
+  for (let i = 0; i < 3; i += 1) {
+    const hit = run.fall[i].hit;
+    if (r2 < hit) continue;
+    const p = displayAt(map, data, i, r2);
+    ctx.strokeStyle = theme[data.people[i].region];
+    const u = ramp(r2, hit, hit + 1.4);
+    if (u < 1) {
+      ctx.globalAlpha = base * 0.6 * (1 - u ** 3);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, lerp$1(5, 17, 1 - (1 - Math.min(1, u * 2.5)) ** 3), 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    const hold = ramp(r2, hit + 0.5, hit + 1.1) * out;
+    if (hold > 0) {
+      ctx.globalAlpha = base * hold;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, Math.max(6, map.radius * 3), 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
 }
 function drawBalls(ctx, map, state, data, theme, trace) {
   ctx.save();
@@ -15742,6 +15918,7 @@ function drawBalls(ctx, map, state, data, theme, trace) {
     for (let i = 0; i < data.people.length; i++) {
       if (data.people[i].region !== region || Number.isNaN(state.x[i])) continue;
       const p = displayBall(map, data, state, i);
+      if (p.waiting) continue;
       ctx.moveTo(p.x + p.radius, p.y);
       ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
     }
@@ -15830,6 +16007,15 @@ function drawFamily(ctx, map, t, theme) {
   const f = pairFamilies(t).primary;
   paintFamily(ctx, map, f.e, f.alpha, 1, f.reference, theme);
 }
+var FURNITURE_DIM = 0.25;
+function exemplarFurniture(t) {
+  const ex = segment("exemplars"), ev = segment("everyone");
+  return ramp(t, ex.end - 0.7, ex.end) * lerp$1(1, FURNITURE_DIM, ramp(t, ev.start + STREAM_START, ev.start + STREAM_START + 0.6) * (1 - ramp(t, ev.end - 0.8, ev.end - 0.1)));
+}
+function exemplarSolo(t, k2) {
+  const f = primaryRun().flash[k2];
+  return t >= segment("exemplars").end - 0.7 ? 0 : flashAlpha(f, t) * clamp01((t - f.a) / 0.25);
+}
 function drawFilm(ctx, t, assets, theme, view = VIEWBOX$1) {
   ctx.save();
   ctx.fillStyle = theme.paper;
@@ -15842,19 +16028,20 @@ function drawFilm(ctx, t, assets, theme, view = VIEWBOX$1) {
   if (assets && primary) {
     const data = assets.cases[PRIMARY];
     const map = maps.primary;
-    const fan = scene.primary.fan;
-    if (primary.active >= 0 && !familyAt(t).visible) {
+    const furniture = exemplarFurniture(t);
+    if (furniture > 0) {
       ctx.save();
-      ctx.globalAlpha *= 1 - (fan?.alpha ?? 0);
-      drawActive(ctx, map, data.people[primary.active], data.e, theme);
+      ctx.globalAlpha *= furniture;
+      drawFamily(ctx, map, t, theme);
       ctx.restore();
     }
+    if (!familyAt(t).visible) drawFlashes(ctx, map, data, primary.r, theme);
+    drawChoices(ctx, map, data, primary.r, theme);
     drawBalls(ctx, map, primary, data, theme, {
       t,
       runAt: (time) => sceneAt$1(time).primary.r
     });
-    if (scene.primary.r <= EXEMPLAR_ENDS[2]) drawExemplarRings(ctx, map, primary, data, theme);
-    if (scene.primary.r >= EXEMPLAR_ENDS[2]) drawFamily(ctx, map, t, theme);
+    drawExemplarRings(ctx, map, data, primary.r, t, theme);
   } else {
     const map = maps.primary;
     ctx.save();
@@ -15876,12 +16063,12 @@ function drawFilm(ctx, t, assets, theme, view = VIEWBOX$1) {
       ctx.save();
       paintFamily(ctx, map, f.e, 1, 1, 1, theme);
       ctx.restore();
-      if (comparison2.active >= 0) drawActive(ctx, map, data.people[comparison2.active], data.e, theme);
+      drawFlashes(ctx, map, data, comparison2.r, theme);
+      drawChoices(ctx, map, data, comparison2.r, theme);
       drawBalls(ctx, map, comparison2, data, theme, {
         t,
         runAt: (time) => sceneAt$1(time).comparison.r
       });
-      if (scene.comparison.r <= EXEMPLAR_ENDS[2]) drawExemplarRings(ctx, map, comparison2, data, theme);
     }
     ctx.restore();
   }
@@ -15928,38 +16115,48 @@ function Axes({ map }) {
 }
 function PileOverlay({ t, view }) {
   const scene = sceneAt$1(t), maps = panelMaps(scene.move, view.height);
-  const who = activePerson(scene.primary.r);
   const e2 = familyAt(t).e;
   const names = [
     "w_L",
     "w_B",
     "w_H"
   ];
-  const shown = scene.primary.r >= 9.55 ? [
+  const furniture = exemplarFurniture(t);
+  const shown = [
     0,
     1,
     2
-  ] : who >= 0 && who < 3 ? [who] : [];
+  ].map((i) => ({
+    i,
+    a: Math.max(exemplarSolo(t, i), furniture)
+  })).filter((s) => s.a > 0.01);
+  const buncherSolo = exemplarSolo(t, 1);
   return jsxs("g", {
     className: "pile-overlay",
     children: [
       jsx(Axes, { map: maps.primary }),
-      scene.move === 0 && shown.map((i) => jsx(SvgMathLabel, {
-        tex: names[i],
-        x: maps.primary.XZ(EXEMPLARS[i] * 1.03 ** e2),
-        y: maps.primary.stripTop - 10,
-        width: 65,
-        height: 34,
-        anchor: "middle",
-        className: `pile-math pile-math-${choice(EXEMPLARS[i], e2).region}`
+      scene.move === 0 && shown.map(({ i, a }) => jsx("g", {
+        opacity: a < 0.999 ? a : void 0,
+        children: jsx(SvgMathLabel, {
+          tex: names[i],
+          x: maps.primary.XZ(EXEMPLARS[i] * 1.03 ** e2),
+          y: maps.primary.stripTop - 10,
+          width: 65,
+          height: 34,
+          anchor: "middle",
+          className: `pile-math pile-math-${choice(EXEMPLARS[i], e2).region}`
+        })
       }, i)),
-      scene.move === 0 && who === 1 && jsx(SvgMathLabel, {
-        tex: "1-t_1\\le\\mathrm{MC}\\le 1-t_0",
-        x: maps.primary.XZ(RATES.zStar) + 20,
-        y: maps.primary.MY((MB_LOW + MB_HIGH) / 2),
-        width: 280,
-        height: 36,
-        className: "pile-math pile-math-buncher"
+      scene.move === 0 && buncherSolo > 0.01 && jsx("g", {
+        opacity: buncherSolo < 0.999 ? buncherSolo : void 0,
+        children: jsx(SvgMathLabel, {
+          tex: "1-t_1\\le\\mathrm{MC}\\le 1-t_0",
+          x: maps.primary.XZ(RATES.zStar) + 20,
+          y: maps.primary.MY((MB_LOW + MB_HIGH) / 2),
+          width: 280,
+          height: 36,
+          className: "pile-math pile-math-buncher"
+        })
       }),
       scene.move > 0 && jsx("g", {
         opacity: scene.comparisonIn,
@@ -16301,7 +16498,7 @@ function buildSweep(people = baselinePeople()) {
   const initialScale = (CDF_PLOT.bottom - CDF_PLOT.top) / (heightPerShare * recordingScale);
   const towerWidth = PACKING.binWidth * recordingScale;
   const redWidth = 0.65 * PACKING.binWidth * recordingScale;
-  const runs = [
+  const runs2 = [
     {
       region: "lower",
       from: 0,
@@ -16335,7 +16532,7 @@ function buildSweep(people = baselinePeople()) {
     bins,
     atom,
     m,
-    runs,
+    runs: runs2,
     duration: elapsed,
     accumulation
   };
