@@ -5627,9 +5627,22 @@ function ExtensionLink() {
     })
   });
 }
+var SLIDES_HREF = "https://dylantmoore.github.io/website/specbunch_NTA_2026.html";
+function SlidesLink() {
+  return jsx("span", {
+    className: "rf-link-row",
+    children: jsx("a", {
+      className: "rf-extension-link rf-slides-link",
+      href: SLIDES_HREF,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      children: "Slides: my NTA 2026 talk on this estimator →"
+    })
+  });
+}
 function narration(key, text, index) {
   if (key === "identified") return prose(text, " ", jsx(ProofButton, { step: index }));
-  if (key === "spectral") return prose(text, jsx(ExtensionLink, {}, "extension"));
+  if (key === "spectral") return prose(text, jsx(ExtensionLink, {}, "extension"), jsx(SlidesLink, {}, "slides"));
   return prose(text);
 }
 var randomFrictionsChapter = {
