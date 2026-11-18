@@ -403,7 +403,7 @@ function PublicEndPresent({ slug }) {
 }
 var THEME_KEY$1 = "bdr-theme";
 function readTheme() {
-  if (typeof window === "undefined") return "deco";
+  if (typeof window === "undefined") return "classic";
   const param = new URLSearchParams(window.location.search).get("theme");
   if (param === "deco" || param === "classic") {
     try {
@@ -417,7 +417,7 @@ function readTheme() {
     if (stored === "deco" || stored === "classic") return stored;
   } catch {
   }
-  return "deco";
+  return "classic";
 }
 var THEME_EVENT = "bdr-theme-change";
 function applyTheme(theme) {
@@ -429,7 +429,7 @@ function subscribeTheme(callback) {
   return () => window.removeEventListener(THEME_EVENT, callback);
 }
 function themeSnapshot() {
-  return document.documentElement.dataset.theme === "classic" ? "classic" : "deco";
+  return document.documentElement.dataset.theme === "deco" ? "deco" : "classic";
 }
 var PRESENT_KEY = "bdr-present";
 var PRESENT_EVENT = "bdr-present-change";
@@ -534,7 +534,7 @@ function Shell({ chapter, initialStep = 0 }) {
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [boardOpen, setBoardOpen] = useState(false);
-  const theme = useSyncExternalStore(subscribeTheme, themeSnapshot, () => "deco");
+  const theme = useSyncExternalStore(subscribeTheme, themeSnapshot, () => "classic");
   const devQuery = useDevQuery();
   const present = useSyncExternalStore(subscribePresent, presentSnapshot, () => false);
   const panelRef = useRef(null);
@@ -1007,7 +1007,7 @@ function Shell({ chapter, initialStep = 0 }) {
               className: "theme-toggle",
               role: "group",
               "aria-label": "Visual theme",
-              children: ["deco", "classic"].map((option) => jsx("button", {
+              children: ["classic", "deco"].map((option) => jsx("button", {
                 type: "button",
                 "aria-pressed": theme === option,
                 className: theme === option ? "is-current" : void 0,
@@ -1541,11 +1541,12 @@ function boot() {
   ensureSessionStorage();
   guardHistory();
   routeTrackFetches();
-  try {
-    window.localStorage.removeItem(THEME_KEY);
+  let theme = new URLSearchParams(window.location.search).get("theme");
+  if (theme !== "deco" && theme !== "classic") try {
+    theme = window.localStorage.getItem(THEME_KEY);
   } catch {
   }
-  document.documentElement.dataset.theme = "deco";
+  document.documentElement.dataset.theme = theme === "deco" ? "deco" : "classic";
 }
 var DESIGN = {
   width: 1366,
