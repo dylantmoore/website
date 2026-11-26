@@ -80,6 +80,8 @@ mark{background:#FBE7A6;color:inherit;padding:0 3px;border-radius:3px;transition
 .title-sub{margin:20px 0 0}
 .title-credit{margin:34px 0 0}
 .policy-tasks{margin-top:40px;gap:24px}
+.closing-grid{flex:1;display:flex;align-items:center;justify-content:space-between;gap:56px;min-height:0}
+.closing-grid img{height:560px;width:auto;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.12);object-fit:cover}
 .policy-tasks h3{font:650 29px/1.15 var(--serif);margin:0 0 8px;color:var(--blue)}
 .policy-tasks p{font:500 22px/1.35 var(--sans);margin:0}
 @media (max-width:700px) and (orientation:portrait){
@@ -109,6 +111,8 @@ mark{background:#FBE7A6;color:inherit;padding:0 3px;border-radius:3px;transition
   .msvg {width:100%; height:auto; flex:none;}
   #count {right:16px; bottom:23px;}
   #foot {display:none;}
+  .closing-grid{flex-direction:column;align-items:flex-start;gap:24px}
+  .closing-grid img{height:auto;width:100%;max-width:420px}
   #notes {max-height:34vh; overflow:auto; width:min(90vw,480px);}
 }
 
@@ -212,6 +216,17 @@ mark{background:#FBE7A6;color:inherit;padding:0 3px;border-radius:3px;transition
   <div class="mid f" style="margin-top:36px">Real feedback: faculty, and embarrassment.</div>
 </section>
 
+<!-- CLOSING -->
+<section class="slide title-slide closing" data-notes="Thank you. Questions?">
+  <div class="closing-grid">
+    <div>
+      <h1>Thank you!</h1>
+      <p class="mid title-sub">Questions?</p>
+      <p class="sm title-credit">Dylan T. Moore</p>
+    </div>
+
+  </div>
+</section>
 <div id="bar"></div><div id="foot">Dylan T. Moore · What is Public Economics &amp; What’s Up With AI?</div><div id="count"></div>
 </div></div>
 <div id="nav"><button id="bPrev" type="button">◀</button><button id="bNext" type="button">▶</button><button id="bNotes" type="button">Notes (N)</button></div>
