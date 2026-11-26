@@ -68,7 +68,7 @@ mark{background:#FBE7A6;color:inherit;padding:0 3px;border-radius:3px;transition
 .slide.mono{padding:32px 84px 28px}
 .mtitle{font-size:36px;margin:0 0 4px}
 .mcap{font-family:var(--serif);font-size:32px;font-weight:600;line-height:1.2;color:var(--ink);margin-top:8px}
-.msvg text{font-family:var(--mono);font-size:17px;fill:var(--muted)}
+.msvg text{font-family:var(--mono);font-size:17px;fill:var(--muted);paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
 .msvg .lab{font-family:var(--sans);font-size:19px;font-weight:500}
 .msvg .big{font-family:var(--sans);font-size:22px;font-weight:600}
 .msvg .huge{font-family:var(--serif);font-size:34px;font-weight:650;fill:var(--ink)}
@@ -215,13 +215,14 @@ function mk(a,b,A,B,comp){const Lc=(A-a)/(b+B), wc=a+b*Lc, Lm=comp?Lc:(A-a)/(2*b
 const comp=mk(4,1.5,16,1.5,true), townA=mk(4,1.5,20,1,false), townB=mk(9,0.25,15,1,false);
 function drawMarket(g,r,M,w,name){
   const P=panel(g,r.x,r.y,r.w,r.h,[0,8],[0,20],'workers','wage',[0,2,4,6,8],[0,5,10,15,20],null,v=>'$'+v);
-  if(name) txt(g,r.x+r.w/2,r.y-28,name,{'text-anchor':'middle',class:'big',fill:C.ink});
+  if(name) txt(g,r.x+r.w/2,r.y-24,name,{'text-anchor':'middle',class:'big',fill:C.ink});
   line(g,P.X(0),P.Y(M.a),P.X(8),P.Y(M.a+M.b*8),C.sup,3);
   txt(g,P.X(8),P.Y(M.a+M.b*8)+(M.b>1?-8:20),'supply',{'text-anchor':'end',class:'lab',fill:C.sup});
   const Ld=Math.min(8,M.A/M.B); line(g,P.X(0),P.Y(M.A),P.X(Ld),P.Y(M.A-M.B*Ld),C.dem,3);
   txt(g,P.X(8),P.Y(M.A-M.B*8)+22,'demand',{'text-anchor':'end',class:'lab',fill:C.dem});
   if(!M.comp){const Lx=Math.min(8,(20-M.a)/(2*M.b)); line(g,P.X(0),P.Y(M.a),P.X(Lx),P.Y(M.a+2*M.b*Lx),C.sup,2,'7 5');
-    const lx=M.b>1?4.3:8; txt(g,P.X(lx)+(M.b>1?10:0),P.Y(M.a+2*M.b*lx)-(M.b>1?0:8),'cost of next worker',{'text-anchor':M.b>1?'start':'end',class:'lab',fill:C.sup,style:'font-size:17px'});}
+    if(M.b>1){const wl=20-320/r.h, lx=(wl-M.a)/(2*M.b); txt(g,P.X(lx)-10,P.Y(wl),'cost of next worker',{'text-anchor':'end',class:'lab',fill:C.sup,style:'font-size:17px'});}
+    else txt(g,P.X(8),P.Y(M.a+2*M.b*8)-8,'cost of next worker',{'text-anchor':'end',class:'lab',fill:C.sup,style:'font-size:17px'});}
   // reference: competitive equilibrium
   line(g,P.X(M.Lc),P.Y(M.wc),P.X(M.Lc),P.Y(0),C.mute,1,'2 4'); line(g,P.X(0),P.Y(M.wc),P.X(M.Lc),P.Y(M.wc),C.mute,1,'2 4');
   el('circle',{cx:P.X(M.Lc),cy:P.Y(M.wc),r:7,fill:'#fff',stroke:C.ink,'stroke-width':2.2},g);
@@ -263,8 +264,8 @@ const steps=[
   draw:u=>{const w=6+11.5*u;drawMarket(svg,{x:90,y:40,w:440,h:410},townA,w);drawTrace(svg,{x:700,y:40,w:440,h:410},townA,w,C.A);}},
  {title:'Two towns, same data', dur:10000,
   cap:'Same data, opposite effects',
-  draw:u=>{const w=6+11.5*u;drawMarket(svg,{x:80,y:36,w:440,h:250},townA,w,'Town A: few other employers');drawTrace(svg,{x:80,y:350,w:440,h:150},townA,w,C.A);
-    drawMarket(svg,{x:680,y:36,w:440,h:250},townB,w,'Town B: many other employers');drawTrace(svg,{x:680,y:350,w:440,h:150},townB,w,C.B);}},
+  draw:u=>{const w=6+11.5*u;drawMarket(svg,{x:80,y:52,w:440,h:236},townA,w,'Town A: few other employers');drawTrace(svg,{x:80,y:350,w:440,h:150},townA,w,C.A);
+    drawMarket(svg,{x:680,y:52,w:440,h:236},townB,w,'Town B: many other employers');drawTrace(svg,{x:680,y:350,w:440,h:150},townB,w,C.B);}},
  {title:'Adding up the two towns', dur:3000,
   cap:'Add the two towns together',
   draw:u=>{const e=ease(Math.min(1,u*1.25));const P=panel(svg,150,30,900,440,[8,18],[0,14],'minimum wage','workers employed, both towns',[8,10,12,14,16,18],[0,2,4,6,8,10,12,14],v=>'$'+v);
@@ -278,16 +279,16 @@ const steps=[
   cap:'Many markets: one smooth curve',
   draw:u=>{const Ms=markets(0.35,0);const n=Math.max(2,Math.round(2*Math.pow(200,ease(u))));const P=aggPanel(svg,{x:150,y:30,w:900,h:440},[-100,60]);
     line(svg,P.X(8),P.Y(0),P.X(18),P.Y(0),C.mute,1);
-    for(let i=0;i<Math.min(n,70);i++){const pts=[];for(let v=8;v<=18.001;v+=0.1)pts.push([P.X(v),P.Y(100*(Ms[i].L(v)/L0-1))]);poly(svg,pts,C.gray,1.2,'',0.7);}
+    for(let i=0;i<Math.min(n,70);i++){const pts=[];for(let v=8;v<=18.001;v+=0.1)pts.push([P.X(v),P.Y(Math.min(60,100*(Ms[i].L(v)/L0-1)))]);poly(svg,pts,C.gray,1.2,'',0.7);}
     aggCurve(svg,P,Ms,C.ink,4.5,'',n);txt(svg,P.X(17.9),P.Y(48),n+' markets',{'text-anchor':'end',class:'big',fill:C.ink});
 }},
  {title:'What if markets differ more in monopsony power?', loop:1,
   cap:'More different markets: smaller gains, usually a lower best floor',
   draw:(u,lab)=>{const sig=0.05+0.85*u, Ms=markets(sig,0);
     // histogram of markdowns
-    const H=panel(svg,70,60,300,330,[0,1.2],[0,0.3],'monopsony power (wage markdown)','share of markets',[0,0.4,0.8,1.2],[0,0.1,0.2,0.3]);
+    const H=panel(svg,70,60,300,330,[0,1.2],[0,0.6],'monopsony power (wage markdown)','share of markets',[0,0.4,0.8,1.2],[0,0.2,0.4,0.6]);
     const bins=Array(12).fill(0);Ms.forEach(M=>{const k=Math.min(11,Math.floor(M.m/0.1));bins[k]++;});
-    bins.forEach((c,k)=>el('rect',{x:H.X(k*0.1)+1,y:H.Y(c/NMAX),width:H.X(0.1)-H.X(0)-2,height:H.Y(0)-H.Y(c/NMAX),fill:C.A,opacity:.8},svg));
+    bins.forEach((c,k)=>el('rect',{x:H.X(k*0.1)+1,y:H.Y(Math.min(0.6,c/NMAX)),width:H.X(0.1)-H.X(0)-2,height:H.Y(0)-H.Y(Math.min(0.6,c/NMAX)),fill:C.A,opacity:.8},svg));
     txt(svg,70,30,'how much monopsony power varies',{class:'lab',fill:C.ink});
     const P=aggPanel(svg,{x:520,y:30,w:620,h:440},[-100,50]);line(svg,P.X(8),P.Y(0),P.X(18),P.Y(0),C.mute,1);
     aggCurve(svg,P,Ms,C.ink,4.5);
