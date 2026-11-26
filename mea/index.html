@@ -50,6 +50,8 @@ svg .lab{font-family:var(--sans);font-size:17px;font-weight:500}
 a.btn{display:inline-block;font:600 18px var(--sans);color:#fff;background:var(--ink);padding:12px 22px;border-radius:999px;text-decoration:none}
 a.btn:focus-visible{outline:3px solid var(--red);outline-offset:3px}
 #count{position:absolute;right:28px;bottom:18px;font:500 13px var(--mono);color:var(--grey)}
+#foot{position:absolute;left:28px;bottom:18px;font:500 13px var(--sans);color:var(--grey);letter-spacing:.01em}
+.slide.title-slide.on~#foot,.slide.title-slide.on~#count{display:none}
 #bar{position:absolute;left:0;bottom:0;height:4px;background:var(--red);transition:width .3s}
 #nav{position:fixed;left:14px;bottom:12px;display:flex;gap:6px;opacity:.35}
 #nav:hover,#nav:focus-within{opacity:1}
@@ -106,6 +108,7 @@ mark{background:#FBE7A6;color:inherit;padding:0 3px;border-radius:3px;transition
   .card {padding:10px 14px;}
   .msvg {width:100%; height:auto; flex:none;}
   #count {right:16px; bottom:23px;}
+  #foot {display:none;}
   #notes {max-height:34vh; overflow:auto; width:min(90vw,480px);}
 }
 
@@ -194,7 +197,7 @@ mark{background:#FBE7A6;color:inherit;padding:0 3px;border-radius:3px;transition
   <div class="eyebrow">AI · 1</div>
   <h2>Policy</h2>
   <div class="big">Not “nothing to see here.”<br>Not “20% of GDP next year.”</div>
-  <div class="mid f" style="margin-top:36px">Same toolkit: who bears it, what's the welfare cost, what's fair?</div>
+  <div class="mid f" style="margin-top:36px">Same toolkit: who bears it, what’s the welfare cost, what’s fair?</div>
 </section>
 <section class="slide" data-notes="Writing is thinking. Taste and judgment are the scarce inputs. Econ has no settled truth: you have to convince humans.">
   <div class="eyebrow">AI · 2</div>
@@ -205,11 +208,11 @@ mark{background:#FBE7A6;color:inherit;padding:0 3px;border-radius:3px;transition
 <section class="slide" data-notes="Fail fast. Real feedback comes from faculty and from embarrassment. Bring your own ideas, not Claude's.">
   <div class="eyebrow">AI · 3</div>
   <h2>How to learn with it</h2>
-  <div class="big">Fail fast.<br>Bring your ideas, not Claude's.</div>
+  <div class="big">Fail fast.<br>Bring your ideas, not Claude’s.</div>
   <div class="mid f" style="margin-top:36px">Real feedback: faculty, and embarrassment.</div>
 </section>
 
-<div id="bar"></div><div id="count"></div>
+<div id="bar"></div><div id="foot">Dylan T. Moore · What is Public Economics &amp; What’s Up With AI?</div><div id="count"></div>
 </div></div>
 <div id="nav"><button id="bPrev" type="button">◀</button><button id="bNext" type="button">▶</button><button id="bNotes" type="button">Notes (N)</button></div>
 <button id="bFull" type="button" title="Full screen (F)" aria-keyshortcuts="F">Full screen</button>
