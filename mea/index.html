@@ -20,7 +20,7 @@
 html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);overflow:hidden}
 body{font-family:var(--sans)}
 #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
-#stage{width:1280px;height:720px;position:relative;background:var(--card);transform-origin:center center;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+#stage{flex:none;width:1280px;height:720px;position:relative;background:var(--card);transform-origin:center center;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .slide{position:absolute;inset:0;padding:60px 84px 56px;display:none;flex-direction:column}
 .slide.on{display:flex}
 .eyebrow{font:500 14px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--red);margin-bottom:18px}
@@ -73,13 +73,35 @@ mark{background:#FBE7A6;color:inherit;padding:0 3px;border-radius:3px;transition
 .msvg .big{font-family:var(--sans);font-size:22px;font-weight:600}
 .msvg .huge{font-family:var(--serif);font-size:34px;font-weight:650;fill:var(--ink)}
 
+@media (pointer: coarse) {
+  #nav {opacity:1; z-index:6; bottom:max(8px, env(safe-area-inset-bottom));}
+  #nav button,#bFull {min-height:44px; min-width:44px;}
+  #bFull {top:max(8px, env(safe-area-inset-top)); right:max(10px, env(safe-area-inset-right));}
+  #notes {bottom:64px;}
+}
+@media (max-width:700px) and (orientation:portrait) {
+  #stage {width:100%; height:100%;}
+  .slide,.slide.mono {padding:68px 16px 84px; overflow:auto;}
+  .center {flex:none;}
+  .eyebrow {font-size:12px; line-height:1.35; margin-bottom:12px;}
+  h2,.mtitle {font-size:clamp(24px,6.5vw,36px); margin-bottom:12px;}
+  .big {font-size:clamp(25px,7vw,42px);}
+  .mid,.mcap {font-size:clamp(17px,4.7vw,25px);}
+  .sm {font-size:15px;}
+  .row {flex-direction:column; gap:8px!important; margin-top:22px!important;}
+  .card {padding:10px 14px;}
+  .msvg {width:100%; height:auto; flex:none;}
+  #count {right:16px; bottom:23px;}
+  #notes {max-height:34vh; overflow:auto; width:min(90vw,480px);}
+}
+
 </style>
 </head>
 <body>
 <div id="wrap"><div id="stage">
 
 <!-- 1 TITLE -->
-<section class="slide" data-notes="1:30–3:00. Joel, asked 'Is our tax system fair?' (PAW, Jan 2016). Economists bring the menu; the values come from somewhere else, and PF makes you say them.">
+<section class="slide on" data-notes="1:30–3:00. Joel, asked 'Is our tax system fair?' (PAW, Jan 2016). Economists bring the menu; the values come from somewhere else, and PF makes you say them.">
   <div class="eyebrow">Why public finance</div>
   <div class="center">
     <div class="big" style="max-width:1080px">“‘Fair’ is a question better left to philosophers and ethicists and theologians.”</div>
@@ -301,7 +323,11 @@ window.MONO={steps, play(k,target){ const st=steps[k]; if(raf)cancelAnimationFra
 <script>
 (function(){
   const stage = document.getElementById('stage');
-  function fit(){ const s = Math.min(innerWidth/1280, innerHeight/720); stage.style.transform = 'scale(' + s + ')'; }
+  const phonePortrait = matchMedia('(max-width: 700px) and (orientation: portrait)');
+  function fit(){
+    const scale = Math.min(innerWidth/1280, innerHeight/720);
+    stage.style.transform = phonePortrait.matches ? 'none' : 'scale(' + scale + ')';
+  }
   addEventListener('resize', fit); fit();
 
   const slides = [...document.querySelectorAll('.slide')];
@@ -309,6 +335,7 @@ window.MONO={steps, play(k,target){ const st=steps[k]; if(raf)cancelAnimationFra
   const frags = s => [...s.querySelectorAll('.f')];
   const visCount = s => frags(s).filter(e => e.classList.contains('v')).length;
   const hooks = {};
+  let setG = () => {};
 
   function show(n, allFrags){
     idx = Math.max(0, Math.min(slides.length-1, n));
@@ -321,6 +348,7 @@ window.MONO={steps, play(k,target){ const st=steps[k]; if(raf)cancelAnimationFra
     try { history.replaceState(null, '', '#' + (idx+1)); } catch(e){}
     if (s.dataset.enter!=="mono" && window.MONO && MONO.stop) MONO.stop();
     if (s.dataset.enter && hooks[s.dataset.enter]) hooks[s.dataset.enter](s);
+    if (phonePortrait.matches) s.scrollTop = 0;
     fragChanged(s);
   }
   function fragChanged(s){
@@ -378,12 +406,14 @@ window.MONO={steps, play(k,target){ const st=steps[k]; if(raf)cancelAnimationFra
 
   /* ---------- KaTeX ---------- */
   function tex(){
-    if (!window.katex) return setTimeout(tex, 150);
+    if (!window.katex) return;
     document.querySelectorAll('.katex-i').forEach(el => katex.render(el.dataset.tex, el, {throwOnError:false}));
-    katex.render('t^{*}=\\dfrac{1-g}{1-g+a\\,e}', document.getElementById('saez'), {throwOnError:false, displayMode:false});
+    if (document.getElementById('saez')) katex.render('t^{*}=\\dfrac{1-g}{1-g+a\\,e}', document.getElementById('saez'), {throwOnError:false, displayMode:false});
   }
-  tex();
+  if (document.readyState === 'complete') tex();
+  else window.addEventListener('load', tex, {once:true});
 
+  if (document.getElementById('dialSvg') && document.getElementById('gSlider') && document.getElementById('tRead')) {
   /* ---------- Dial: Saez top rate ---------- */
   const A = 1.5, E = 0.25, NS = 'http://www.w3.org/2000/svg';
   const tstar = g => (1-g)/(1-g+A*E);
@@ -409,7 +439,7 @@ window.MONO={steps, play(k,target){ const st=steps[k]; if(raf)cancelAnimationFra
     document.getElementById('tRead').innerHTML = 'g = ' + g.toFixed(2) + ' &nbsp;→&nbsp; <span style="color:#B4472C">t* = ' + Math.round(100*t) + '%</span>';
     slider.value = g;
   }
-  function setG(target){
+  setG = function(target){
     if (anim) cancelAnimationFrame(anim);
     const from = +slider.value, t0 = performance.now(), dur = 900;
     const step = now => { const u = Math.min(1,(now-t0)/dur), e = u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2; drawG(from + (target-from)*e); if (u<1) anim = requestAnimationFrame(step); };
@@ -419,8 +449,11 @@ window.MONO={steps, play(k,target){ const st=steps[k]; if(raf)cancelAnimationFra
   drawG(0);
   hooks.dial = () => {};
 
+  }
+
   /* ---------- Bunching dots ---------- */
-  const cv = document.getElementById('bunchCanvas'), cx = cv.getContext('2d');
+  const cv = document.getElementById('bunchCanvas'), cx = cv?.getContext('2d');
+  if (cx) {
   const W = 2220, H = 900, x0 = 100, x1 = 2140, base = 780, BIN = 34, R = 7;
   const kink = 100 + 30*34, bw = 140;
   let dots = [], raf = null;
@@ -460,6 +493,8 @@ window.MONO={steps, play(k,target){ const st=steps[k]; if(raf)cancelAnimationFra
   }
   function runBunch(){ if (raf) cancelAnimationFrame(raf); seed(); raf = requestAnimationFrame(frame); }
   hooks.bunch = runBunch;
+  cv.addEventListener('click', runBunch);
+  }
   /* ---------- Monopsony example (merged from its own slide) ---------- */
   document.querySelectorAll('.slide.mono').forEach(sec => {
     const k = +sec.dataset.mono, st = window.MONO && MONO.steps[k];
@@ -467,7 +502,6 @@ window.MONO={steps, play(k,target){ const st=steps[k]; if(raf)cancelAnimationFra
     sec.querySelector('.msvg').addEventListener('click', () => hooks.mono(sec));
   });
   hooks.mono = sec => { if (window.MONO) MONO.play(+sec.dataset.mono, sec.querySelector('.msvg')); };
-  cv.addEventListener('click', runBunch);
 
   const start = parseInt((location.hash||'').slice(1), 10);
   show(isFinite(start) && start > 0 ? start-1 : 0, false);
