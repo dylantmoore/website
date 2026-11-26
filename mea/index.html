@@ -73,6 +73,20 @@ mark{background:#FBE7A6;color:inherit;padding:0 3px;border-radius:3px;transition
 .msvg .big{font-family:var(--sans);font-size:22px;font-weight:600}
 .msvg .huge{font-family:var(--serif);font-size:34px;font-weight:650;fill:var(--ink)}
 
+
+.title-slide h1{max-width:1050px;font-size:76px}
+.title-sub{margin:20px 0 0}
+.title-credit{margin:34px 0 0}
+.policy-tasks{margin-top:40px;gap:24px}
+.policy-tasks h3{font:650 29px/1.15 var(--serif);margin:0 0 8px;color:var(--blue)}
+.policy-tasks p{font:500 22px/1.35 var(--sans);margin:0}
+@media (max-width:700px) and (orientation:portrait){
+  .title-slide h1{font-size:clamp(38px,11vw,64px)}
+  .title-credit{margin-top:26px}
+  .policy-tasks h3{font-size:21px}
+  .policy-tasks p{font-size:16px}
+}
+
 @media (pointer: coarse) {
   #nav {opacity:1; z-index:6; bottom:max(8px, env(safe-area-inset-bottom));}
   #nav button,#bFull {min-height:44px; min-width:44px;}
@@ -100,17 +114,25 @@ mark{background:#FBE7A6;color:inherit;padding:0 3px;border-radius:3px;transition
 <body>
 <div id="wrap"><div id="stage">
 
-<!-- 1 TITLE -->
-<section class="slide on" data-notes="1:30–3:00. Joel, asked 'Is our tax system fair?' (PAW, Jan 2016). Economists bring the menu; the values come from somewhere else, and PF makes you say them.">
+<!-- TITLE -->
+<section class="slide on title-slide">
+  <div class="eyebrow">Mānoa Economics Association</div>
+  <div class="center">
+    <h1>Who’s Doing the Thinking?</h1>
+    <p class="mid title-sub">Public finance, policy, and AI</p>
+    <p class="sm title-credit">Dylan T. Moore<br>University of Hawaiʻi at Mānoa</p>
+  </div>
+</section>
+<!-- WHY PUBLIC FINANCE -->
+<section class="slide" data-notes="1:30–3:00. Joel, asked 'Is our tax system fair?' (PAW, Jan 2016). Economists bring the menu; the values come from somewhere else, and public finance makes them explicit. A causal estimate can tell us what one policy did. To choose a policy, we still need to compare feasible alternatives, say whose gains and losses count, and work out which facts could change our choice.">
   <div class="eyebrow">Why public finance</div>
   <div class="center">
     <div class="big" style="max-width:1080px">“‘Fair’ is a question better left to philosophers and ethicists and theologians.”</div>
     <div class="mid" style="margin-top:22px;max-width:1080px">“…economists can lay out a menu of appropriate policies … when given <span class="red">— from somewhere else —</span> what the social view of fairness is.”</div>
     <div class="sm" style="margin-top:18px">— Joel Slemrod, <i>Princeton Alumni Weekly</i> Q&amp;A, 2016</div>
-    <div class="row f" style="margin-top:56px;gap:24px">
-      <div class="col card"><div class="mid">Who should pay?</div></div>
-      <div class="col card"><div class="mid">Whose welfare counts?</div></div>
-      <div class="col card"><div class="mid">What even is income?</div></div>
+    <div class="row f policy-tasks">
+      <div class="col card"><h3>Map values to policy</h3><p>Make the goals and trade-offs explicit. Given those goals, which feasible policies would we choose?</p></div>
+      <div class="col card"><h3>Work out what we need to know</h3><p>Which facts about who gains, who pays, and how people respond could change that choice?</p></div>
     </div>
   </div>
 </section>
